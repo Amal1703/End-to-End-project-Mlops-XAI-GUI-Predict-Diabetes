@@ -1,0 +1,12 @@
+pandas 
+numpy
+scikit-learn
+matplotlib
+tensorflow
+xgboost
+lime
+shap
+
+notebook  # Jupyter notebook
+
+-e .

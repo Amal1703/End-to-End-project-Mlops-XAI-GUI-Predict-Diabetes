@@ -1,0 +1,21 @@
+# data columns and their type
+
+COLUMNS:
+  area: float64
+  bedrooms: int64
+  bathrooms: int64
+  stories: int64
+  mainroad: str
+  guestroom: str
+  basement: str
+  hotwaterheating: str
+  airconditioning: str
+  parking: int64
+  prefarea: str
+  furnishingstatus: str
+  price: float64
+
+
+TARGET_COLUMN:
+  name: price
+  
