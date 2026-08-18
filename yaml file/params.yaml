@@ -1,4 +1,22 @@
-Model_name: ElasticNet
-# model parameters
-alpha: 2
-l1_ratio: 0.9999
+models:
+  - model_name: XGBoost
+    params:
+      n_estimators: 200
+
+  - model_name: SVM
+    params:
+      C: 1
+      gamma: 0.04
+
+  - model_name: ANN
+    params:
+      epochs: 100
+      batch_size: 4
+      hidden_layer_sizes: 64, 32
+      activation_hidden_layer: "relu"
+      dropout_values: 0.5, 0.2
+      l2: 0.1 
+    # Optimizer
+      optimizer: Adam
+      lr: 0.01
+      
