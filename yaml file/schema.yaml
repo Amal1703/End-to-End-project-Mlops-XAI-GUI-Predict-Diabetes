@@ -1,21 +1,15 @@
 # data columns and their type
 
 COLUMNS:
-  area: float64
-  bedrooms: int64
-  bathrooms: int64
-  stories: int64
-  mainroad: str
-  guestroom: str
-  basement: str
-  hotwaterheating: str
-  airconditioning: str
-  parking: int64
-  prefarea: str
-  furnishingstatus: str
-  price: float64
-
+  Pregnancies: int64
+  Glucose: int64
+  BloodPressure: int64
+  SkinThickness: int64
+  Insulin: int64
+  BMI: float64
+  DiabetesPedigreeFunction: float64
+  Age: int64
 
 TARGET_COLUMN:
-  name: price
+  Outcome: int64
   
