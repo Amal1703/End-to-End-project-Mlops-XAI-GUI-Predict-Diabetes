@@ -139,7 +139,7 @@ MENU = {
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Stages of model training (order of stages from top button to bottom)")
+        self.title("Stages of model training to predict diabetes (order of stages from top button to bottom)")
         self.geometry("400x400")
  
         # Navigation stack for handling the "Back" button
