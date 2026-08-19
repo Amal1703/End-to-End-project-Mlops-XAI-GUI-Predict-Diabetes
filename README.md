@@ -2,7 +2,7 @@
 
 ### The dataset folder containing Predict Diabetes data was downloaded from: //www.kaggle.com/datasets/hasibur013/diabetes-dataset
 
-# The dataset contain:
+# The dataset contains the following features:
  - Pregnancies (Integer): Number of times the patient has been pregnant.
  - Glucose (Integer): Plasma glucose concentration after a 2-hour oral glucose tolerance test.
  - BloodPressure (Integer): Diastolic blood pressure (mm Hg).
@@ -12,7 +12,7 @@
  - DiabetesPedigreeFunction (Float): A function that represents the patient’s diabetes pedigree (i.e., likelihood of diabetes based on family history).
  - Age (Integer): Age of the patient (years).
  - Outcome (Binary/int): Binary outcome (0 or 1) where 1 indicates the presence of diabetes and 0 indicates the absence.
- 
+
 
 # How to run this project?
 ### STEPS:
