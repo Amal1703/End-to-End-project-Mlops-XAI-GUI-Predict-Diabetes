@@ -1,8 +1,8 @@
-# pyinstaller
-
 pandas 
 numpy
+joblib
 scikit-learn
+seaborn
 matplotlib
 tensorflow
 xgboost
