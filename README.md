@@ -2,7 +2,7 @@
 
 ### The dataset folder containing Predict Diabetes data was downloaded from: //www.kaggle.com/datasets/hasibur013/diabetes-dataset
 
-# The dataset contains the following features:
+## The dataset contains the following features:
  - Pregnancies (Integer): Number of times the patient has been pregnant.
  - Glucose (Integer): Plasma glucose concentration after a 2-hour oral glucose tolerance test.
  - BloodPressure (Integer): Diastolic blood pressure (mm Hg).
