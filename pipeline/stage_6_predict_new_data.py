@@ -3,8 +3,8 @@ from utils.common import load_yaml_config
 import pandas as pd
 
 
-#  (using ANN)
-class PredictNewData: 
+#  using ANN
+class PredictNewData:
 
     def __init__(self, config_path: str = "yaml file/config.yaml", schema_filepath: str = "yaml file/schema.yaml"):
         self.config = load_yaml_config(config_path)
@@ -20,8 +20,8 @@ class PredictNewData:
     def predict_new_data(self, **kwargs) -> int:
         # Compare the number of arguments received (len(kwargs)) to the expected number of columns (len(X_train.columns))
         if len(kwargs) != len(self.feature_names):
-            raise ValueError   (f"Incorrect number of values: {len(kwargs)} provided,"
-                                f"{len(self.feature_names)} expected ({list(self.feature_names)})")    
+            raise ValueError(   f"Incorrect number of values: {len(kwargs)} provided,"
+                                f"{len(self.feature_names)} expected ({list(self.feature_names)})")
 
         # DataFrame with the expected set of column names
         data = pd.DataFrame([kwargs], columns=self.feature_names)
