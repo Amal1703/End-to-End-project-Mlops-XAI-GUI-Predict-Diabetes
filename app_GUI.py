@@ -198,7 +198,7 @@ class App(tk.Tk):
             test_size_value = float(test_size_value.replace(',', '.').strip()) if test_size_value.replace(
                 ',', '.').strip().replace('.', '').isdigit() else test_size_value  # type(test_size_value) = str
 
-            if (type(test_size_value) == float) and (0 < test_size_value < 1):
+            if (isinstance(test_size_value, float)) and (0 < test_size_value < 1):
                 print(f"--- {text} (Entered value : {test_size_value}) ---")
             try:
                 content.callback(test_size_value)

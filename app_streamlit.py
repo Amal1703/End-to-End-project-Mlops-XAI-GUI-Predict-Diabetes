@@ -280,8 +280,8 @@ with col4:
             st.session_state.dialog_action = None
             st.rerun()
 
-        # Open the dialog box
-        if st.session_state.show_dialog == True:
+        # Open the dialog box (st.session_state.show_dialog = true)
+        if st.session_state.show_dialog: 
             test_size = _dialog_content()
 
         # Display the logs if dialog is closed and validated

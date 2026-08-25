@@ -68,7 +68,7 @@ async def pipeline_predict(request: Request):
                 filtered_data = {k: v for k,
                                  v in form_dict.items() if k in model_fields}
 
-               # check whether filtered_data is empty
+                # check whether filtered_data is empty
                 if not filtered_data:
                     # add default values or return an error
                     return templates.TemplateResponse("predict.html", {
