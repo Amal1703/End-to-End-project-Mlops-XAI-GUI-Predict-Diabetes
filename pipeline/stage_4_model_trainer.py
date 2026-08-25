@@ -94,7 +94,6 @@ def SVM (X_train_1, X_test_1, y_train, y_test, C, gamma) -> None :
         svm_model.fit(X_train_scaled, y_train)
 
         y_pred_svm = svm_model.predict(X_test_scaled)
-        #print(classification_report(y_test, y_pred_svm))
 
         calculate_errors(y_pred_svm, y_test)
         search_false_positives_or_false_negatives_in_predictions(y_pred_svm, y_test)
@@ -149,8 +148,7 @@ def calculate_errors(y_pred, y_test)  -> None:
 
 class ModelTrainer:
    # Shared variables for all functions
-    min_index = 0   # Corresponds to the index that shows the minimum error rate after dropping the features using XGBoost
-    X_train_2 = 0  # X_train for ANN (after splitting train.csv into train and validation sets)
+    min_index = 0  # Corresponds to the index that shows the minimum error rate after dropping the features using XGBoost
 
 
     def __init__(self, config_path: str = "yaml file/config.yaml", schema_filepath: str = "yaml file/schema.yaml", params_filepath: str = "yaml file/params.yaml"):
@@ -175,7 +173,7 @@ class ModelTrainer:
                                             test_size = test_size, 
                                             random_state=42     
                                             )
-
+        print("test_size:", test_size)
         print(f"Train: {X_train.shape}, Test: {X_test.shape}")  
         
         os.makedirs(os.path.dirname(self.config["model_trainer"]["train_data_path"]) or ".", exist_ok=True)
@@ -222,15 +220,18 @@ class ModelTrainer:
        drop_feature=[]
        error_rate = []
 
-       for i in range(len(self.list_feature_drop)):
+       for i in range(len(self.list_feature_drop) + 1):
            print("drop features", drop_feature)
            X_train_1 = X_train.drop(drop_feature, axis=1)
            X_test_1 = X_test.drop(drop_feature, axis=1)
            errors, n_errors = XGBoost (X_train_1, X_test_1, y_train, y_test, n_estimators)
            error_rate.append(n_errors)
-           drop_feature.append(self.list_feature_drop[i])
+           if i < len(self.list_feature_drop):
+             drop_feature.append(self.list_feature_drop[i])
+           else:
+             break
            
-    # Search for the minimum error rate and the features that were removed using XGBoost
+       # search for the minimum error rate and the features that were removed using XGBoost
        print("")
        ModelTrainer.min_index = np.argmin(error_rate)
        print(f"The features removed using XGBoost correspond to the lowest error rate: {self.list_feature_drop[:ModelTrainer.min_index]}")   
@@ -293,15 +294,26 @@ class ModelTrainer:
        print("For ANN training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])     
         
        # Split train data into train and validation sets
-       ModelTrainer.X_train_2, X_val_2, y_train_2, y_val_2 = train_test_split(
+       X_train_2, X_val_2, y_train_2, y_val_2 = train_test_split(
            X_train_1, y_train, test_size=0.10, random_state=42, stratify=y_train
        )
 
-       print(f"Split train data (train.csv) into train and validation sets: Train: {ModelTrainer.X_train_2.shape}, Validation: {X_val_2.shape}, Test: {X_test_1.shape}") 
+       os.makedirs(os.path.dirname(self.config["model_trainer"]["train_data_ANN_path"]) or ".", exist_ok=True)
+       os.makedirs(os.path.dirname(self.config["model_trainer"]["val_data_ANN_path"]) or ".", exist_ok=True)
+       
+       # Concat X_train_2 and y_train_2, then save it 
+       df_train_ANN = pd.concat([X_train_2, y_train_2], axis=1)
+       df_train_ANN.to_csv(self.config["model_trainer"]["train_data_ANN_path"], index=False)
+
+       # Concat X_val_2 and y_val_2, then save it
+       df_val_ANN = pd.concat([X_val_2, y_val_2], axis=1)
+       df_val_ANN.to_csv(self.config["model_trainer"]["val_data_ANN_path"], index=False)
+
+       print(f"Split train data (train.csv) into train and validation sets: Train: {X_train_2.shape}, Validation: {X_val_2.shape}, Test: {X_test_1.shape}") 
        
        # Normalization
        scaler = StandardScaler()
-       X_train_scaled = scaler.fit_transform(ModelTrainer.X_train_2)
+       X_train_scaled = scaler.fit_transform(X_train_2)
        X_val_scaled = scaler.transform(X_val_2)
        X_test_scaled = scaler.transform(X_test_1) 
     

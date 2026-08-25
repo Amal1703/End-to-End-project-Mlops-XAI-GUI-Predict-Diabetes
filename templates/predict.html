@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Diabetes Prediction</title>
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="static/css/styles.css" rel="stylesheet" />
+    </head>
+<body>
+
+    <div class="container position-relative px-4 px-lg-5">
+     <div class="row gx-4 gx-lg-5 justify-content-center">
+       <div class="col-md-10 col-lg-8 col-xl-7">
+           <div class="site-heading">
+                <h1>Diabetes Prediction</h1>
+           </div>
+       </div>
+     </div>
+    </div>
+
+    
+    <form class="form-detail-1" action="/predict_or_pipeline" method="post" id="predictForm">
+
+       <h2>
+        <br>
+        Please Fill The Information
+       </h2>
+
+        {% for col in feature_names %}
+            <div class="form-row">
+                <label for="{{ col }}">{{ col }}</label>
+                <input
+                    type="text"
+                    name="{{ col }}"
+                    id="{{ col }}"
+                    value="{{ values.get(col, '0') if values else '0' }}"
+                >
+                {% if errors and col in errors %}
+                    <p style="color: red;">{{ errors[col] }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <input type="submit" name="predict" class="register_1" value="Predict">
+    </form>
+
+    <br> <a href="/">Back to homepage</a>
+
+
+        <!-- Footer-->
+        <footer class="border-top">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <ul class="list-inline text-center">
+
+                            <li class="list-inline-item">
+                                <a href="https://www.linkedin.com/in/amal-kammoun-b03528180/">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fas fa-circle fa-stack-2x"></i>
+                                        <i class="fab fa-linkedin fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="https://github.com/Amal1703">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fas fa-circle fa-stack-2x"></i>
+                                        <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="small text-center text-muted fst-italic"></div>
+                        <div class="small text-center text-muted fst-italic"></div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+
+</body>
+</html>

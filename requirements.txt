@@ -12,4 +12,13 @@ shap
 PyYAML
 notebook  # Jupyter notebook
 
+streamlit 
+flask 
+tkinter
+
+# for fastapi
+fastapi
+python-multipart
+itsdangerous
+
 -e .

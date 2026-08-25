@@ -1,0 +1,105 @@
+name: workflow # Defines the name displayed in GitHub Actions
+
+on:
+  push:
+    branches: # Each `git push origin main` to the `main` branch triggers the CI/CD pipeline and starts the Continuous Deployment process.
+      - main
+    paths-ignore: # Ignore changes that only affect the README.md file
+      - 'README.md'
+
+permissions:
+  id-token: write # Allows GitHub Actions to request an OIDC token.
+                  # Commonly used for cloud deployments (AWS, Azure, GCP).
+                  # Instead of storing long-lived credentials (e.g., AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY),
+                  # GitHub generates a secure temporary token to authenticate and deploy resources,
+                  # such as pushing a Docker image or deploying an application to the cloud.
+
+  contents: read # Read all files in the GitHub repository
+
+jobs: # A workflow consists of multiple jobs
+  integration: # Name of the first workflow job
+    name: Continuous Integration  # Name of the CI pipeline step: verify that the code works correctly
+    runs-on: ubuntu-latest # Defines the operating system of the virtual machine where the pipeline will run.
+    steps: # Steps
+      - name: Checkout Code
+        uses: actions/checkout@v3 # uses: This is the official GitHub action that downloads all the code from the repository
+                                  # and places it in the runner's working directory.
+                                  # @v3: Specifies the version of the action (version 3).
+      - name: Lint code
+        run: echo "Linting repository" # Runs a Linux command to display code quality issues.
+                                       # Goal: detect: Syntax errors, Bad coding style & Unused variables
+                                       # Example:
+                                       # Writing if (x = 5) instead of if (x == 5).
+                                       # A linter will detect this mistake and display an error message.
+      - name: Run unit tests
+        run: echo "Running unit tests" # Does not run the tests. It only displays the message "Running unit tests"
+                                       # in the GitHub Actions terminal.
+                                       # run: pytest runs the unit tests.
+
+  build-and-push-ecr-image: # Name of the second workflow job
+    name: Continuous Delivery  # CD = Build a Docker image and push it to Amazon ECR
+    needs: integration  # If the "integration" job fails, the CD job will not start
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: latest
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          
+          
+  Continuous-Deployment: # Name of the third workflow job
+    needs: build-and-push-ecr-image # À chaque nouvelle version de l'application, GitHub télécharge la dernière image Docker, la lance automatiquement et nettoie les anciennes ressources.
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      
+      - name: Pull latest images
+        run: |
+         docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+
+      - name: Run Docker Image to serve users
+        run: |
+         docker run -d -p 8080:8080 --name=mlproj -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+      - name: Clean previous images and containers
+        run: |
+         docker system prune -f

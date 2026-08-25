@@ -19,9 +19,13 @@ data_transformation: # transform the data: feature selection methods (PCA, MI et
 
 model_trainer: # normalization, splits data into train, test and validation (validation set only ANN), training model and evaluation
   #root_dir: artifacts/model_trainer
-  train_data_path: artifacts/model_trainer/train.csv
-  test_data_path: artifacts/model_trainer/test.csv
-  test_size_value_file: artifacts/model_trainer/test_size_value_file.txt 
+  train_data_path: artifacts/model_trainer/train.csv # for XGBoost and SVM
+  test_data_path: artifacts/model_trainer/test.csv # for XGBoost, SVM and ANN
+  test_size_value_file: artifacts/model_trainer/test_size_value_file.txt  # for XGBoost and SVM
+
+  train_data_ANN_path: artifacts/model_trainer/train_ANN.csv # for ANN: split the train data into train and validation datasets
+  val_data_ANN_path: artifacts/model_trainer/val_ANN.csv # for ANN: we need validation data
+  
   model_path: artifacts/model_trainer/model.joblib
   scaler_path: artifacts/model_trainer/scaler.joblib
 
