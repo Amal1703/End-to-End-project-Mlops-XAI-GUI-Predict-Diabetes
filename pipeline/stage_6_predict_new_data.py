@@ -1,8 +1,6 @@
 import joblib
 from utils.common import load_yaml_config
-import numpy as np
 import pandas as pd
-
 
 class PredictNewData: # (using ANN)
 
@@ -11,7 +9,6 @@ class PredictNewData: # (using ANN)
         self.schema = load_yaml_config(schema_filepath)
         self.model_ANN = joblib.load(self.config["model_trainer"]['model_path'])
         self.scaler_load = joblib.load(self.config["model_trainer"]['scaler_path'])
-        
         self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_ANN_path"])
         self.target = 'Outcome'
         self.X_train = self.df_train.drop(self.target, axis=1)
@@ -35,5 +32,5 @@ class PredictNewData: # (using ANN)
         y_pred_new = (y_pred_prob_new.flatten() > 0.5).astype(int)
         return int(y_pred_new[0])
     
-    def get_input_column_X_train_and_schema (self):
+    def get_input_column_X_train_and_schema(self):
         return self.feature_names, self.schema["COLUMNS"]
