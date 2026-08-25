@@ -26,7 +26,8 @@ def prompt_input(parent, title, message, default_value=""):
 
     # Entry field
     entry_var = tk.StringVar(value=default_value)
-    entry = tk.Entry(dialog, textvariable=entry_var, width=40, font=("Arial", 10))
+    entry = tk.Entry(dialog, textvariable=entry_var,
+                     width=40, font=("Arial", 10))
     entry.pack(pady=10)
     entry.focus_set()
     entry.select_range(0, tk.END)
@@ -42,8 +43,10 @@ def prompt_input(parent, title, message, default_value=""):
     btn_frame = tk.Frame(dialog)
     btn_frame.pack(pady=10)
 
-    tk.Button(btn_frame, text="OK", command=on_ok, width=10, bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=10)
-    tk.Button(btn_frame, text="Annuler", command=on_cancel, width=10, bg="#f44336", fg="white").pack(side=tk.LEFT, padx=10)
+    tk.Button(btn_frame, text="OK", command=on_ok, width=10,
+              bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=10)
+    tk.Button(btn_frame, text="Annuler", command=on_cancel, width=10,
+              bg="#f44336", fg="white").pack(side=tk.LEFT, padx=10)
 
     # Enter shortcut
     entry.bind('<Return>', lambda e: on_ok())
@@ -57,6 +60,8 @@ def prompt_input(parent, title, message, default_value=""):
 # Represents a button that must first ASK the user for a value
 # (via a dialog box), then call callback(value) with what was entered
 # ---------------------------------------------------------
+
+
 class AskForValue:
     def __init__(self, callback, type_="float"):
         """
@@ -75,9 +80,9 @@ class ConsoleRedirector:
         self.widget_text = widget_text
 
     def write(self, message):
-    # print() may call write() multiple times for a single line
-    # (once per argument + separators): we insert it as-is,
-    # WITHOUT adding a \n ourselves (print() already sends its own final \n).
+        # print() may call write() multiple times for a single line
+        # (once per argument + separators): we insert it as-is,
+        # WITHOUT adding a \n ourselves (print() already sends its own final \n).
         if message != "":
             self.widget_text.insert(tk.END, message)
             self.widget_text.see(tk.END)
@@ -93,7 +98,7 @@ class ConsoleRedirector:
 # ---------------------------------------------------------
 MENU = {
     "Data ingestion": {
-        "Extract the zip file into the data directory":  lambda: DataIngestion().extract_zip_file(),
+        "Extract the zip file into the data directory": lambda: DataIngestion().extract_zip_file(),
     },
 
     "Data validation": {
@@ -136,7 +141,8 @@ MENU = {
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Stages of model training to predict diabetes (order of stages from top button to bottom)")
+        self.title(
+            "Stages of model training to predict diabetes (order of stages from top button to bottom)")
         self.geometry("400x400")
 
         # Navigation stack for handling the "Back" button
@@ -172,7 +178,7 @@ class App(tk.Tk):
                 height=3,
                 wraplength=300,
                 justify="center",
-                #anchor="center",
+                # anchor="center",
                 command=lambda c=content, t=text: self.click(c, t),
             )
             btn.pack(fill="x", pady=5)
@@ -187,15 +193,18 @@ class App(tk.Tk):
     def click(self, content, text):
         if isinstance(content, AskForValue):
             # First, prompt the user for a test size value using a popup dialog
-            test_size_value = prompt_input(self, "Test size", "Enter any decimal value between 0 and 1", "0.2")
-            test_size_value = float(test_size_value.replace(',', '.').strip()) if test_size_value.replace(',', '.').strip().replace('.', '').isdigit() else test_size_value  # type(test_size_value) = str
+            test_size_value = prompt_input(
+                self, "Test size", "Enter any decimal value between 0 and 1", "0.2")
+            test_size_value = float(test_size_value.replace(',', '.').strip()) if test_size_value.replace(
+                ',', '.').strip().replace('.', '').isdigit() else test_size_value  # type(test_size_value) = str
 
             if (type(test_size_value) == float) and (0 < test_size_value < 1):
                 print(f"--- {text} (Entered value : {test_size_value}) ---")
             try:
                 content.callback(test_size_value)
             except Exception:
-                print(f"ERROR (entered value: {test_size_value}), the test size must be a decimal between 0 and 1")
+                print(
+                    f"ERROR (entered value: {test_size_value}), the test size must be a decimal between 0 and 1")
 
         if isinstance(content, dict):
             # It's a sub-menu: we move forward / we navigate deeper
@@ -206,7 +215,8 @@ class App(tk.Tk):
             # It's a function: we execute it now.
             print(f"--- Start : {text} ---")
             try:
-                content()  # actual call, its print() output appears in real time.
+                # actual call, its print() output appears in real time.
+                content()
                 print(f"--- End : {text} ---\n")
             except Exception as e:
                 print(f"Error : {e}")
@@ -224,4 +234,3 @@ class App(tk.Tk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
-

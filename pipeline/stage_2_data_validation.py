@@ -15,18 +15,21 @@ class DataValidation:
     # Compare type and name columns of schema and df
     def compare_type_and_name_columns(self) -> None:
 
-        expected_schema = {**self.schema["COLUMNS"], **self.schema["TARGET_COLUMN"]}
+        expected_schema = {
+            **self.schema["COLUMNS"], **self.schema["TARGET_COLUMN"]}
 
         actual_schema = self.df.dtypes.astype(str).to_dict()
         actual_cols = set(actual_schema.keys())
         expected_cols = set(expected_schema.keys())
 
-        missing_cols = expected_cols - actual_cols       # in schema but not in df (file data)
+        # in schema but not in df (file data)
+        missing_cols = expected_cols - actual_cols
         extra_cols = actual_cols - expected_cols         # in df but not in schema
         common_cols = actual_cols & expected_cols
 
         type_mismatches = {
-            col: {"expected in schema": expected_schema[col], "found in file data": actual_schema[col]}
+            col: {
+                "expected in schema": expected_schema[col], "found in file data": actual_schema[col]}
             for col in common_cols
             if expected_schema[col] != actual_schema[col]}
 
@@ -42,7 +45,8 @@ class DataValidation:
         print("Visualize data\n", self.df.head())
         print("rows, column:", self.df.shape)
         print("")
-        print("Number of missing values per column\n", self.df.isnull().sum())  # Number of missing values per column
+        # Number of missing values per column
+        print("Number of missing values per column\n", self.df.isnull().sum())
         print("\nData columns and their type")
         print(self.df.info())  # data columns and their type
 
@@ -64,11 +68,13 @@ class DataValidation:
             plotOne.add_legend()
             plotOne.set_axis_labels(feature, 'Proportion')
             plotOne.fig.suptitle(f'Fig {fig_num}: {title}')
-            plotOne.fig.canvas.manager.set_window_title(f'Fig {fig_num}')  # names the window "Fig 1", "Fig 2", etc.
+            # names the window "Fig 1", "Fig 2", etc.
+            plotOne.fig.canvas.manager.set_window_title(f'Fig {fig_num}')
 
         name_cols = self.df.select_dtypes(include="number").columns
         for i, col in enumerate(name_cols, start=1):
-            plotHistogram(self.df, self.target, col, f'{col} (Blue = Healthy; Orange = Diabetes)', i)
+            plotHistogram(self.df, self.target, col,
+                          f'{col} (Blue = Healthy; Orange = Diabetes)', i)
 
         plt.show()  # shows ALL figures (fig1...fign) at once, at the end
 

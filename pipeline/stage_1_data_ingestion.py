@@ -19,5 +19,6 @@ class DataIngestion:
         os.makedirs(unzip_dir, exist_ok=True)
 
         with zipfile.ZipFile(local_data_file, "r") as z:
-            print("Name of files which are extracted:", z.namelist())  # List the files contained in the zip
+            # List the files contained in the zip
+            print("Name of files which are extracted:", z.namelist())
             z.extractall(unzip_dir)

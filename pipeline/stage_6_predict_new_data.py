@@ -9,9 +9,12 @@ class PredictNewData:
     def __init__(self, config_path: str = "yaml file/config.yaml", schema_filepath: str = "yaml file/schema.yaml"):
         self.config = load_yaml_config(config_path)
         self.schema = load_yaml_config(schema_filepath)
-        self.model_ANN = joblib.load(self.config["model_trainer"]['model_path'])
-        self.scaler_load = joblib.load(self.config["model_trainer"]['scaler_path'])
-        self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_ANN_path"])
+        self.model_ANN = joblib.load(
+            self.config["model_trainer"]['model_path'])
+        self.scaler_load = joblib.load(
+            self.config["model_trainer"]['scaler_path'])
+        self.df_train = pd.read_csv(
+            self.config["model_trainer"]["train_data_ANN_path"])
         self.target = 'Outcome'
         self.X_train = self.df_train.drop(self.target, axis=1)
         self.feature_names = list(self.X_train.columns)

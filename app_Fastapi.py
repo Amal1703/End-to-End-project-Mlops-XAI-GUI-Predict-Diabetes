@@ -65,7 +65,8 @@ async def pipeline_predict(request: Request):
                 form_dict = dict(form)
                 model_fields = set(validated_data_model.model_fields.keys())
                 # only keep the fields that the model expects ('predict' excluded)
-                filtered_data = {k: v for k, v in form_dict.items() if k in model_fields}
+                filtered_data = {k: v for k,
+                                 v in form_dict.items() if k in model_fields}
 
                # check whether filtered_data is empty
                 if not filtered_data:
@@ -89,37 +90,38 @@ async def pipeline_predict(request: Request):
             if errors:
                 return templates.TemplateResponse(
                     "predict.html",
-                        {
-                            "request": request,
-                            "feature_names": feature_names,
-                            "errors": errors,
-                            "values": form
-                        }
-                    )
+                    {
+                        "request": request,
+                        "feature_names": feature_names,
+                        "errors": errors,
+                        "values": form
+                    }
+                )
 
             # all values are valid -> make the prediction
-            input_values = {k: v for k, v in data.model_dump().items() if k in feature_names}
+            input_values = {
+                k: v for k, v in data.model_dump().items() if k in feature_names}
 
             prediction = PredictNewData().predict_new_data(**input_values)
 
             return templates.TemplateResponse('results.html',
                                               {
-                                                    "request": request,
-                                                    "prediction": (prediction)
-                                                })
+                                                  "request": request,
+                                                  "prediction": (prediction)
+                                              })
 
     else:
-    # GET, no button recognized -> display the empty form
+        # GET, no button recognized -> display the empty form
         feature_names = FEATURE_NAMES
         return templates.TemplateResponse('predict.html',
                                           {"request": request,
                                            "feature_names": feature_names,
                                            "values": 0
-                                        })
+                                           })
 
 
 if __name__ == "__main__":
-	# reload=True: reload the server when the Python code changes (for production, it must be removed)
-	uvicorn.run(host="0.0.0.0", port=8080, reload=True)
+    # reload=True: reload the server when the Python code changes (for production, it must be removed)
+    uvicorn.run(host="0.0.0.0", port=8080, reload=True)
 
-	# uvicorn.run(host="0.0.0.0", port = 8080)
+    # uvicorn.run(host="0.0.0.0", port = 8080)

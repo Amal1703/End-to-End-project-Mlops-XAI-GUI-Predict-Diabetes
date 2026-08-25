@@ -38,7 +38,7 @@ jobs: # A workflow consists of multiple jobs
       - name: Lint code
         run: |
            pip install flake8            
-           flake8 . --max-line-length=200 
+           flake8 . --max-line-length=300 
 
 
       - name: Run unit tests

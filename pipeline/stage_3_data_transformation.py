@@ -48,7 +48,8 @@ class DataTransformation:
         # Sort by MI value (from highest to lowest)
         sorted_indices = np.argsort(mi_scores)[::-1]
         for i in sorted_indices:
-            print(f"{self.df.drop(self.target, axis=1).columns[i]}: MI = {mi_scores[i]:.4f}")
+            print(
+                f"{self.df.drop(self.target, axis=1).columns[i]}: MI = {mi_scores[i]:.4f}")
 
 
 # 2. Embedded methods
@@ -56,13 +57,15 @@ class DataTransformation:
     def random_forest(self) -> None:
         rf = RandomForestClassifier(n_estimators=200, random_state=42)
         rf.fit(self.X, self.y)
-        importance = pd.Series(rf.feature_importances_, index=self.X.columns).sort_values(ascending=False)
+        importance = pd.Series(rf.feature_importances_,
+                               index=self.X.columns).sort_values(ascending=False)
         print(importance)
 
     def XGBoost(self):
         xgb_model = xgb.XGBClassifier(n_estimators=200, random_state=42)
         xgb_model.fit(self.X, self.y)
-        importance = pd.Series(xgb_model.feature_importances_, index=self.X.columns).sort_values(ascending=False)
+        importance = pd.Series(xgb_model.feature_importances_,
+                               index=self.X.columns).sort_values(ascending=False)
         print(importance)
         return importance
 
@@ -76,7 +79,8 @@ class DataTransformation:
         print("Other feature selection methods generally give the same result")
 
         # Save the list of the feature to drop in data_transformation
-        os.makedirs(os.path.dirname(self.config["data_transformation"]["list_feature_drop_file"]) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(
+            self.config["data_transformation"]["list_feature_drop_file"]) or ".", exist_ok=True)
         with open(self.config["data_transformation"]["list_feature_drop_file"], "w") as f:
             for element in list_feature_drop:
                 f.write(str(element) + "\n")

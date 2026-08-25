@@ -122,7 +122,8 @@ def render_toggle_stage_button(i):
 
     arrow = "▲" if st.session_state[session_state[i]] else "▼"
     if st.button(stage_name[i] + "  " + f"{arrow}", use_container_width=True, key=key[i]):
-        st.session_state[session_state[i]] = not st.session_state[session_state[i]]
+        st.session_state[session_state[i]
+                         ] = not st.session_state[session_state[i]]
         st.rerun()   # force an immediate rerun to sync the display upon this click
 
 
@@ -183,7 +184,8 @@ col4, col5, col6 = st.columns(3)
 
 with col1:
     if st.button("📁 Data ingestion", use_container_width=True, key="btn1"):
-        display_results(lambda: DataIngestion().extract_zip_file(), title="Data ingestion")
+        display_results(lambda: DataIngestion(
+        ).extract_zip_file(), title="Data ingestion")
 
 with col2:
 
@@ -194,16 +196,20 @@ with col2:
 
     if st.session_state["show_validation"]:
         if st.button("1: Visualize data and display the number of missing value"):
-            display_results(lambda: DataValidation().explore_data(), title="Visualize data and display the number of missing value")
+            display_results(lambda: DataValidation().explore_data(
+            ), title="Visualize data and display the number of missing value")
 
         if st.button("2: Compare type and name columns of schema.yaml and data file"):
-            display_results(lambda: DataValidation().compare_type_and_name_columns(), title="Compare type and name columns of schema.yaml and data file")
+            display_results(lambda: DataValidation().compare_type_and_name_columns(
+            ), title="Compare type and name columns of schema.yaml and data file")
 
         if st.button("3: Visualize the distribution of a target variable (outcome)"):
-            display_results(lambda: DataValidation().visualize_distribution_target_variable(), title="Visualize the distribution of a target variable (outcome)")
+            display_results(lambda: DataValidation().visualize_distribution_target_variable(
+            ), title="Visualize the distribution of a target variable (outcome)")
 
         if st.button("4: Plot histograms showing the distribution of all features for each category of a target variable"):
-            display_results(lambda: DataValidation().plot_histogram_each_column(), title="Plot histograms showing the distribution of all features for each category of a target variable")
+            display_results(lambda: DataValidation().plot_histogram_each_column(
+            ), title="Plot histograms showing the distribution of all features for each category of a target variable")
 
 with col3:
 
@@ -228,13 +234,16 @@ with col3:
                 if st.session_state["show_Filter_methods"]:
 
                     if st.button("1: Correlation matrix"):
-                        display_results(lambda: DataTransformation().correlation_matrix(), title="Correlation matrix")
+                        display_results(lambda: DataTransformation(
+                        ).correlation_matrix(), title="Correlation matrix")
 
                     if st.button("2: Mutual information"):
-                        display_results(lambda: DataTransformation().mutual_information(), title="Mutual information")
+                        display_results(lambda: DataTransformation(
+                        ).mutual_information(), title="Mutual information")
 
                     if st.button("3: ANOVA F test"):
-                        display_results(lambda: DataTransformation().ANOVA_F_test(), title=" ANOVA F test")
+                        display_results(lambda: DataTransformation(
+                        ).ANOVA_F_test(), title=" ANOVA F test")
 
             with b2:
                 if "show_Embedded_methods" not in st.session_state:
@@ -245,14 +254,17 @@ with col3:
                 if st.session_state["show_Embedded_methods"]:
 
                     if st.button("1: Random forest"):
-                        display_results(lambda: DataTransformation().random_forest(), title="Random forest")
+                        display_results(lambda: DataTransformation(
+                        ).random_forest(), title="Random forest")
 
                     if st.button("2: XGBoost"):
-                        display_results(lambda: DataTransformation().XGBoost(), title="XGBoost")
+                        display_results(
+                            lambda: DataTransformation().XGBoost(), title="XGBoost")
 
             with b3:
                 if st.button("3: Show and save the 5 least important features to a file (based on XGBoost)"):
-                    display_results(lambda: DataTransformation().save_least_important_features_to_file(), title="Show and save the 5 least important features to a file (based on XGBoost)")
+                    display_results(lambda: DataTransformation().save_least_important_features_to_file(
+                    ), title="Show and save the 5 least important features to a file (based on XGBoost)")
 
 
 with col4:
@@ -279,18 +291,22 @@ with col4:
             st.session_state.dialog_action = None
 
         if st.button("2: Train and evaluate XGBoost by sequentially dropping features: first remove the 5 least important, then 4, then 3, until none remain"):
-            display_results(lambda: ModelTrainer().XGBoost_evaluate_feature_drop(), title="Train and evaluate XGBoost by sequentially dropping features: first remove the 5 least important, then 4, then 3, until none remain")
+            display_results(lambda: ModelTrainer().XGBoost_evaluate_feature_drop(
+            ), title="Train and evaluate XGBoost by sequentially dropping features: first remove the 5 least important, then 4, then 3, until none remain")
 
         if st.button("3: Train and evaluate SVM by dropping the features that were found by XGBoost to correspond to the lowest error rate"):
-            display_results(lambda: ModelTrainer().SVM_evaluate_feature_drop(), title="Train and evaluate SVM by dropping the features that were found by XGBoost to correspond to the lowest error rate")
+            display_results(lambda: ModelTrainer().SVM_evaluate_feature_drop(
+            ), title="Train and evaluate SVM by dropping the features that were found by XGBoost to correspond to the lowest error rate")
 
         if st.button("4: Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate"):
-            display_results(lambda: ModelTrainer().ANN_evaluate_feature_drop(), title="Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate")
+            display_results(lambda: ModelTrainer().ANN_evaluate_feature_drop(
+            ), title="Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate")
 
 
 with col5:
     if st.button("🔬 XAI (Shap method using ANN model)", use_container_width=True, key="btn5"):
-        display_results(lambda: XAI().SHAP(), title="XAI (Shap method using ANN model)")
+        display_results(lambda: XAI().SHAP(),
+                        title="XAI (Shap method using ANN model)")
 
 
 with col6:

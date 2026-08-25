@@ -14,17 +14,22 @@ class XAI:
 
     def __init__(self, config_path: str = "yaml file/config.yaml"):
         self.config = load_yaml_config(config_path)
-        self.model_ANN = joblib.load(self.config["model_trainer"]['model_path'])
-        self.scaler_load = joblib.load(self.config["model_trainer"]['scaler_path'])
+        self.model_ANN = joblib.load(
+            self.config["model_trainer"]['model_path'])
+        self.scaler_load = joblib.load(
+            self.config["model_trainer"]['scaler_path'])
 
-        self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_ANN_path"])
-        self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
+        self.df_train = pd.read_csv(
+            self.config["model_trainer"]["train_data_ANN_path"])
+        self.df_test = pd.read_csv(
+            self.config["model_trainer"]["test_data_path"])
         self.target = 'Outcome'
 
         self.X_test = self.df_test.drop(self.target, axis=1)
         self.X_train = self.df_train.drop(self.target, axis=1)
 
-        self.X_test_scaled = self.scaler_load.transform(self.X_test[self.X_train.columns])
+        self.X_test_scaled = self.scaler_load.transform(
+            self.X_test[self.X_train.columns])
         self.X_train_scaled = self.scaler_load.transform(self.X_train)
 
         self.feature_names = list(self.X_train.columns)
@@ -32,7 +37,8 @@ class XAI:
     def SHAP(self) -> None:
 
         # Create the explainer
-        explainer = shap.Explainer(lambda x: self.model_ANN.predict(x, verbose=0), self.X_train_scaled)
+        explainer = shap.Explainer(lambda x: self.model_ANN.predict(
+            x, verbose=0), self.X_train_scaled)
 
         # Compute the SHAP values (for class 1, the model's native output)
         shap_values = explainer(self.X_test_scaled, silent=True)

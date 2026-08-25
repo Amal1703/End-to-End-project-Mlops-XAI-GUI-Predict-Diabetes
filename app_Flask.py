@@ -55,7 +55,8 @@ def pipeline_predict():
                     else:
                         input_values[col] = float(raw_value)
 
-            session['last_values'] = request.form.to_dict()  # the values from the user are saved in the predict fields
+            # the values from the user are saved in the predict fields
+            session['last_values'] = request.form.to_dict()
 
             if errors:
                 return render_template(
@@ -76,9 +77,9 @@ def pipeline_predict():
 
 
 if __name__ == "__main__":
-	# Without debug=True, Flask won't auto-reload the server or the templates.
-	# To avoid having to restart manually after every change during development, enable
-	# debug mode (for development only, never in production)
-	#app.run(host="0.0.0.0", port = 8080, debug=True)
+    # Without debug=True, Flask won't auto-reload the server or the templates.
+    # To avoid having to restart manually after every change during development, enable
+    # debug mode (for development only, never in production)
+    # app.run(host="0.0.0.0", port = 8080, debug=True)
 
-	app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080)

@@ -26,12 +26,15 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
     tf.random.set_seed(seed)
 
     model_ANN = Sequential([
-        Dense(hidden_layer_sizes[0], activation=activation_hidden_layer, kernel_regularizer=l2_reg(l2), input_shape=(X_train_scaled.shape[1],)),
+        Dense(hidden_layer_sizes[0], activation=activation_hidden_layer, kernel_regularizer=l2_reg(
+            l2), input_shape=(X_train_scaled.shape[1],)),
         Dropout(dropout_values[0]),
-        Dense(hidden_layer_sizes[1], activation=activation_hidden_layer, kernel_regularizer=l2_reg(l2)),
+        Dense(hidden_layer_sizes[1], activation=activation_hidden_layer,
+              kernel_regularizer=l2_reg(l2)),
         Dropout(dropout_values[1]),
-        Dense(1, activation='sigmoid')  # Binary output; for multi-class use softmax with n_classes
-                                ])
+        # Binary output; for multi-class use softmax with n_classes
+        Dense(1, activation='sigmoid')
+    ])
 
     model_ANN.compile(
         optimizer=getattr(tf.keras.optimizers, optimizer)(learning_rate=lr),
@@ -75,6 +78,7 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
 
     return model_ANN
 
+
 def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None:
     # Normalization
     scaler = StandardScaler()
@@ -84,7 +88,8 @@ def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None:
     svm_model.fit(X_train_scaled, y_train)
     y_pred_svm = svm_model.predict(X_test_scaled)
     calculate_errors(y_pred_svm, y_test)
-    search_false_positives_or_false_negatives_in_predictions(y_pred_svm, y_test)
+    search_false_positives_or_false_negatives_in_predictions(
+        y_pred_svm, y_test)
 
 
 def XGBoost(X_train, X_test, y_train, y_test, n_estimators) -> None:
@@ -111,20 +116,25 @@ def read_file(file_path):
 
     return lines
 
+
 def search_false_positives_or_false_negatives_in_predictions(y_pred, y_test) -> None:
     y_test_arr = np.array(y_test).flatten()
     false_positives_idx = np.where((y_pred == 1) & (y_test_arr == 0))[0]
     false_negatives_idx = np.where((y_pred == 0) & (y_test_arr == 1))[0]
-    print(f"False positives (predicted diabetic, but not): {len(false_positives_idx)}")
-    print(f"False negatives (predicted non-diabetic, but actually is): {len(false_negatives_idx)}")
+    print(
+        f"False positives (predicted diabetic, but not): {len(false_positives_idx)}")
+    print(
+        f"False negatives (predicted non-diabetic, but actually is): {len(false_negatives_idx)}")
 
-def calculate_errors(y_pred, y_test)  -> None:
+
+def calculate_errors(y_pred, y_test) -> None:
     errors = np.abs(y_pred - y_test.values)
     n_errors = (errors == 1).sum()
     print(f"Number of errors: {n_errors} / {len(y_test)}")
     print(f"Error rate: {n_errors / len(y_test):.2%}")
 
     return errors, n_errors
+
 
 class ModelTrainer:
     # Shared variables for all functions
@@ -135,7 +145,8 @@ class ModelTrainer:
         self.schema = load_yaml_config(schema_filepath)
         self.params = load_yaml_config(params_filepath)
         self.df = pd.read_csv(self.config["data_validation"]["unzip_data_dir"])
-        self.list_feature_drop = read_file(self.config["data_transformation"]["list_feature_drop_file"])
+        self.list_feature_drop = read_file(
+            self.config["data_transformation"]["list_feature_drop_file"])
         self.target = 'Outcome'
         self.X = self.df.drop(self.target, axis=1)
         self.y = self.df[self.target]
@@ -145,26 +156,31 @@ class ModelTrainer:
     def split_data_train_test(self, test_size) -> None:
 
         X_train, X_test, y_train, y_test = train_test_split(
-                                            self.X,  self.y,
-                                            test_size=test_size,
-                                            random_state=42
-                                            )
+            self.X,  self.y,
+            test_size=test_size,
+            random_state=42
+        )
         print("test_size:", test_size)
         print(f"Train: {X_train.shape}, Test: {X_test.shape}")
 
-        os.makedirs(os.path.dirname(self.config["model_trainer"]["train_data_path"]) or ".", exist_ok=True)
-        os.makedirs(os.path.dirname(self.config["model_trainer"]["test_data_path"]) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(
+            self.config["model_trainer"]["train_data_path"]) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(
+            self.config["model_trainer"]["test_data_path"]) or ".", exist_ok=True)
 
         # Concat X_train and y_train, then save it
         df_train = pd.concat([X_train, y_train], axis=1)
-        df_train.to_csv(self.config["model_trainer"]["train_data_path"], index=False)
+        df_train.to_csv(self.config["model_trainer"]
+                        ["train_data_path"], index=False)
 
         # Concat X_test and y_test, then save it
         df_test = pd.concat([X_test, y_test], axis=1)
-        df_test.to_csv(self.config["model_trainer"]["test_data_path"], index=False)
+        df_test.to_csv(self.config["model_trainer"]
+                       ["test_data_path"], index=False)
 
         # Save test size value in a file
-        os.makedirs(os.path.dirname(self.config["model_trainer"]["test_size_value_file"]) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(
+            self.config["model_trainer"]["test_size_value_file"]) or ".", exist_ok=True)
         with open(self.config["model_trainer"]["test_size_value_file"], "w") as f:
             f.write(str(test_size) + "\n")
 
@@ -176,8 +192,10 @@ class ModelTrainer:
         if not os.path.exists(self.config["model_trainer"]["test_data_path"]):
             print("File test.csv doesn't exist, you need to split data")
 
-        self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_path"])
-        self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
+        self.df_train = pd.read_csv(
+            self.config["model_trainer"]["train_data_path"])
+        self.df_test = pd.read_csv(
+            self.config["model_trainer"]["test_data_path"])
 
         X_train = self.df_train.drop(self.target, axis=1)
         y_train = self.df_train[self.target]
@@ -198,7 +216,8 @@ class ModelTrainer:
             print("drop features", drop_feature)
             X_train_1 = X_train.drop(drop_feature, axis=1)
             X_test_1 = X_test.drop(drop_feature, axis=1)
-            errors, n_errors = XGBoost(X_train_1, X_test_1, y_train, y_test, n_estimators)
+            errors, n_errors = XGBoost(
+                X_train_1, X_test_1, y_train, y_test, n_estimators)
             error_rate.append(n_errors)
             if i < len(self.list_feature_drop):
                 drop_feature.append(self.list_feature_drop[i])
@@ -208,7 +227,8 @@ class ModelTrainer:
         # search for the minimum error rate and the features that were removed using XGBoost
         print("")
         ModelTrainer.min_index = np.argmin(error_rate)
-        print(f"The features removed using XGBoost correspond to the lowest error rate: {self.list_feature_drop[:ModelTrainer.min_index]}")
+        print(
+            f"The features removed using XGBoost correspond to the lowest error rate: {self.list_feature_drop[:ModelTrainer.min_index]}")
         print("For other training models, those features will be eliminated")
 
     def SVM_evaluate_feature_drop(self) -> None:
@@ -219,8 +239,10 @@ class ModelTrainer:
         if not os.path.exists(self.config["model_trainer"]["test_data_path"]):
             print("File test.csv doesn't exist, split data")
 
-        self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_path"])
-        self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
+        self.df_train = pd.read_csv(
+            self.config["model_trainer"]["train_data_path"])
+        self.df_test = pd.read_csv(
+            self.config["model_trainer"]["test_data_path"])
 
         X_train = self.df_train.drop(self.target, axis=1)
         y_train = self.df_train[self.target]
@@ -228,8 +250,10 @@ class ModelTrainer:
         X_test = self.df_test.drop(self.target, axis=1)
         y_test = self.df_test[self.target]
 
-        X_train_1 = X_train.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
-        X_test_1 = X_test.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
+        X_train_1 = X_train.drop(
+            self.list_feature_drop[:ModelTrainer.min_index], axis=1)
+        X_test_1 = X_test.drop(
+            self.list_feature_drop[:ModelTrainer.min_index], axis=1)
 
         # get SVM params value from params.yaml
         for item in self.params["models"]:
@@ -239,7 +263,8 @@ class ModelTrainer:
                 print("C value in params.yaml:", C)
                 print("gamma value in params.yaml:", gamma)
 
-        print("For SVM training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])
+        print("For SVM training, those features will be eliminated:",
+              self.list_feature_drop[:ModelTrainer.min_index])
         SVM(X_train_1, X_test_1, y_train, y_test, C, gamma)
 
     def ANN_evaluate_feature_drop(self) -> None:
@@ -250,8 +275,10 @@ class ModelTrainer:
         if not os.path.exists(self.config["model_trainer"]["test_data_path"]):
             print("File test.csv doesn't exist, split data")
 
-        self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_path"])
-        self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
+        self.df_train = pd.read_csv(
+            self.config["model_trainer"]["train_data_path"])
+        self.df_test = pd.read_csv(
+            self.config["model_trainer"]["test_data_path"])
 
         X_train = self.df_train.drop(self.target, axis=1)
         y_train = self.df_train[self.target]
@@ -259,27 +286,35 @@ class ModelTrainer:
         X_test = self.df_test.drop(self.target, axis=1)
         y_test = self.df_test[self.target]
 
-        X_train_1 = X_train.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
-        X_test_1 = X_test.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
+        X_train_1 = X_train.drop(
+            self.list_feature_drop[:ModelTrainer.min_index], axis=1)
+        X_test_1 = X_test.drop(
+            self.list_feature_drop[:ModelTrainer.min_index], axis=1)
 
-        print("For ANN training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])
+        print("For ANN training, those features will be eliminated:",
+              self.list_feature_drop[:ModelTrainer.min_index])
 
         # Split train data into train and validation sets
         X_train_2, X_val_2, y_train_2, y_val_2 = train_test_split(
             X_train_1, y_train, test_size=0.10, random_state=42, stratify=y_train)
 
-        os.makedirs(os.path.dirname(self.config["model_trainer"]["train_data_ANN_path"]) or ".", exist_ok=True)
-        os.makedirs(os.path.dirname(self.config["model_trainer"]["val_data_ANN_path"]) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(
+            self.config["model_trainer"]["train_data_ANN_path"]) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(
+            self.config["model_trainer"]["val_data_ANN_path"]) or ".", exist_ok=True)
 
         # Concat X_train_2 and y_train_2, then save it
         df_train_ANN = pd.concat([X_train_2, y_train_2], axis=1)
-        df_train_ANN.to_csv(self.config["model_trainer"]["train_data_ANN_path"], index=False)
+        df_train_ANN.to_csv(
+            self.config["model_trainer"]["train_data_ANN_path"], index=False)
 
         # Concat X_val_2 and y_val_2, then save it
         df_val_ANN = pd.concat([X_val_2, y_val_2], axis=1)
-        df_val_ANN.to_csv(self.config["model_trainer"]["val_data_ANN_path"], index=False)
+        df_val_ANN.to_csv(self.config["model_trainer"]
+                          ["val_data_ANN_path"], index=False)
 
-        print(f"Split train data (train.csv) into train and validation sets: Train: {X_train_2.shape}, Validation: {X_val_2.shape}, Test: {X_test_1.shape}")
+        print(
+            f"Split train data (train.csv) into train and validation sets: Train: {X_train_2.shape}, Validation: {X_val_2.shape}, Test: {X_test_1.shape}")
 
         # Normalization
         scaler = StandardScaler()
@@ -293,7 +328,8 @@ class ModelTrainer:
                 epochs = item['params']["epochs"]
                 batch_size = item['params']["batch_size"]
                 hidden_layer_sizes = item['params']["hidden_layer_sizes"]
-                hidden_layer_sizes = [int(x) for x in hidden_layer_sizes.split(',')]
+                hidden_layer_sizes = [int(x)
+                                      for x in hidden_layer_sizes.split(',')]
                 activation_hidden_layer = item['params']["activation_hidden_layer"]
                 dropout_values = item['params']["dropout_values"]
                 dropout_values = [float(x) for x in dropout_values.split(',')]
@@ -313,7 +349,8 @@ class ModelTrainer:
 
         # Evaluation
         calculate_errors(y_pred_ANN, y_test)
-        search_false_positives_or_false_negatives_in_predictions(y_pred_ANN, y_test)
+        search_false_positives_or_false_negatives_in_predictions(
+            y_pred_ANN, y_test)
 
         # Save ANN model and scaler
         joblib.dump(model_ANN, self.config["model_trainer"]["model_path"])
