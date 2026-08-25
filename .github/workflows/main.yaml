@@ -1,4 +1,6 @@
-name: workflow # Defines the name displayed in GitHub Actions
+# Add secrets to GitHub (Settings → Secrets and variables → Actions)
+
+name: workflow (CI/CD - GCP) # Defines the name displayed in GitHub Actions
 
 on:
   push:
@@ -16,90 +18,86 @@ permissions:
 
   contents: read # Read all files in the GitHub repository
 
+
 jobs: # A workflow consists of multiple jobs
   integration: # Name of the first workflow job
     name: Continuous Integration  # Name of the CI pipeline step: verify that the code works correctly
     runs-on: ubuntu-latest # Defines the operating system of the virtual machine where the pipeline will run.
     steps: # Steps
       - name: Checkout Code
-        uses: actions/checkout@v3 # uses: This is the official GitHub action that downloads all the code from the repository
+        uses: actions/checkout@v4 # uses: This is the official GitHub action that downloads all the code from the repository
                                   # and places it in the runner's working directory.
-                                  # @v3: Specifies the version of the action (version 3).
+                                  # @v4: Specifies the version of the action (version 4).
       - name: Lint code
-        run: echo "Linting repository" # Runs a Linux command to display code quality issues.
+        run: |
+        pip install flake8            
+        flake8 . --max-line-length=120 # Runs a Linux command to display code quality issues.
                                        # Goal: detect: Syntax errors, Bad coding style & Unused variables
                                        # Example:
                                        # Writing if (x = 5) instead of if (x == 5).
                                        # A linter will detect this mistake and display an error message.
+
+
       - name: Run unit tests
         run: echo "Running unit tests" # Does not run the tests. It only displays the message "Running unit tests"
                                        # in the GitHub Actions terminal.
                                        # run: pytest runs the unit tests.
 
-  build-and-push-ecr-image: # Name of the second workflow job
+  build-and-push-image: # Name of the second workflow job
     name: Continuous Delivery  # CD = Build a Docker image and push it to Amazon ECR
     needs: integration  # If the "integration" job fails, the CD job will not start
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Utilities
         run: |
           sudo apt-get update
           sudo apt-get install -y jq unzip 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Authentication Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      - name: Configure gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID  }}
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+ 
+      - name: Build, tag and push Docker image in Artifact Registry
         id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-          IMAGE_TAG: latest
         run: |
-          # Build a docker container and
-          # push it to ECR so that it can
-          # be deployed to ECS.
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          
+          docker build -t ${{ secrets.GCP_REGION}}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID  }}/${{ secrets.GCP_ARTIFACT_REGISTRY}}/${{ secrets.GCP_IMAGE_NAME }}:latest .
+          docker push ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID  }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/${{ secrets.GCP_IMAGE_NAME }}:latest
+
           
   Continuous-Deployment: # Name of the third workflow job
-    needs: build-and-push-ecr-image # À chaque nouvelle version de l'application, GitHub télécharge la dernière image Docker, la lance automatiquement et nettoie les anciennes ressources.
-    runs-on: self-hosted
+    needs: build-and-push-image # For each new version of the application, GitHub downloads the latest Docker image, automatically runs it and cleans up the old resources
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Authentication Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-      
-      
-      - name: Pull latest images
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+ 
+      - name: Configure gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID  }}
+ 
+      - name: Deploy in Cloud Run
         run: |
-         docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-
-      - name: Run Docker Image to serve users
-        run: |
-         docker run -d -p 8080:8080 --name=mlproj -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-      - name: Clean previous images and containers
-        run: |
-         docker system prune -f
+          gcloud run deploy ${{ secrets.GCP_SERVICE_NAME }} \
+            --image ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID  }}/${{ secrets.GCP_ARTIFACT_REGISTRY }}/${{ secrets.GCP_IMAGE_NAME }}:latest \
+            --platform managed \
+            --region ${{ secrets.GCP_REGION }} \
+            --allow-unauthenticated \
+            --memory=1Gi \
+            --max-instances=1

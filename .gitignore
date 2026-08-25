@@ -219,3 +219,6 @@ __marimo__/
 
 # Artifacts
 artifacts/
+
+# Visual Studio Code
+.vscode/

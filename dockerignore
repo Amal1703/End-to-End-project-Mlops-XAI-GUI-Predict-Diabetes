@@ -1,0 +1,32 @@
+# .dockerignore (necessary for a project using Docker)
+
+# Ignore compiled Python files that aren't needed for building the Docker image
+*.pyc            # Ignore .pyc files, which are automatically compiled Python bytecode files
+*.pyo            # Ignore .pyo files, which are optimized Python bytecode files
+*.pyd            # Ignore .pyd files, which are Windows-specific Python dynamic libraries
+
+# Ignore specific directories that are not necessary for running the application in the container
+__pycache__/     # Ignore .pyc files, which are automatically compiled Python bytecode files
+# .pytest_cache    
+# .idea        
+.vscode/         # Ignore the .vscode/ folder (editor-specific settings for Visual Studio Code — debug config, recommended extensions, workspace settings, etc.)
+
+# Ignore virtual environments — they aren't needed in the container and can take up a lot of space
+# venv/** 
+env/   
+
+# Ignore folders that contain non-essential resources for running the application
+artifacts/      
+dataset/
+notebook/  
+
+# GUI
+app_GUI.py
+
+# Flask
+static/
+templates/
+app_Flask.py
+
+# FastAPI
+app_Fastapi.py

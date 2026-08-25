@@ -53,7 +53,7 @@ def ANN (hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimi
     factor=0.1,  # Divide by 10 (multiply by 0.1)
     patience=5,  # Wait 5 epochs before reducing
     min_lr=1e-7,  # Minimum learning rate
-    verbose=1
+    verbose=2
  )
 
 # Training

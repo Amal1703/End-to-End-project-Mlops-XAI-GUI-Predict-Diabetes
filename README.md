@@ -94,3 +94,48 @@ python app_Fastapi.py
 9. Update the app_streamlit.py 
 
 10. Update the app_Fastapi.py 
+
+11. Deploying a Streamlit app on Google Cloud Console:
+    - Create a Dockerfile 
+    - Create a .dockerignore file to exclude other apps and unnecessary folders for the Docker image
+    - In requirements.txt, comment out the following libraries (as they are not needed for deployment): notebook, flask, fastapi, python-multipart, itsdangerous, lime.
+
+12. creer et remplir le fichier CI:Cd, qui est le fichier main.yaml dans (.github\workflows), # Add secrets to GitHub (Settings → Secrets and variables → Actions) cliquer sur New repository secret) et ajoute les nmaes et leurs secret
+Exple cliquer sur New repository secret:  Name GCP_REGION et secret  europe-west9
+
+
+
+### Deploying a Streamlit application on Google Cloud Console
+
+1. Create an account on Google Cloud Console
+
+2. Create a project on Google Cloud Console (here we retrieve the PROJECT_ID variable)
+
+3. Install Google Cloud SDK: Follow the instructions at: https://docs.cloud.google.com/sdk/docs/install-sdk?hl=en:
+       - To verify that it is installed correctly, run gcloud --version in the terminal
+
+4. Create a Docker repository in artifact registry (search for "artifact registry" in the console). Here we define the following variables:
+       - REGION : The location for your repository
+       - ARTIFACT_REGISTRY_NAME : The name for the artifact repository
+
+5. Build the Docker image in the Artifact Registry repository:
+
+       - gcloud builds submit --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REGISTRY_NAME}/${IMAGE_NAME} 
+       - IMAGE_NAME : This is the name you choose for your Docker image
+
+6. Deploy the image to Google Cloud Run: 
+      - gcloud run deploy ${SERVICE_NAME} `
+        --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REGISTRY_NAME}/${IMAGE_NAME}:latest `
+        --platform managed `
+        --max-instances=1 `
+        --region ${REGION} `
+        --allow-unauthenticated
+
+      - SERVICE_NAME : This the name you choose for your Cloud Run service. It identifies your deployed service in the Google Cloud Console and appears in the generated URL
+
+
+7. After a successful deployment (no errors), the deployment command will output the public URL of your service directly in the terminal. It will look like: https://SERVICE_NAME-xxxxx-REGION.a.run.app
+You can view the URL and logs in the Google Cloud Console
+
+
+

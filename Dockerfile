@@ -14,4 +14,4 @@ COPY . /app_streamlit
 RUN pip install -r requirements.txt 
 
 # Run the application
-CMD ["python3", "app_streamlit.py"] 
+CMD streamlit run app_streamlit.py --server.port=$PORT --server.address=0.0.0.0
