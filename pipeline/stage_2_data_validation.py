@@ -38,7 +38,7 @@ class DataValidation:
         print("type_invalid:", type_mismatches)
 
     # Visualize data and display the number of missing values
-    def explore_data (self) -> None:
+    def explore_data(self) -> None:
         print("Visualize data\n", self.df.head())
         print("rows, column:", self.df.shape)
         print("")
@@ -47,7 +47,7 @@ class DataValidation:
         print(self.df.info())  # data columns and their type
 
     # Visualize the distribution of a target variable (outcome)
-    def visualize_distribution_target_variable (self) -> None:
+    def visualize_distribution_target_variable(self) -> None:
         sns.countplot(x=self.df[self.target], data=self.df)
         plt.title("Distribution of the target variable (outcome)")
         plt.show()

@@ -43,7 +43,7 @@ class DataTransformation:
 
     def mutual_information(self) -> None:
         # Calculate MI for all columns
-        mi_scores = mutual_info_classif (self.X, self.y)
+        mi_scores = mutual_info_classif(self.X, self.y)
 
         # Sort by MI value (from highest to lowest)
         sorted_indices = np.argsort(mi_scores)[::-1]
@@ -66,7 +66,7 @@ class DataTransformation:
         print(importance)
         return importance
 
-    def save_least_important_features_to_file (self) -> None:
+    def save_least_important_features_to_file(self) -> None:
         # Based on the results from all methods:
         # 'Insulin', 'Pregnancies', 'SkinThickness', 'BloodPressure', and 'DiabetesPedigreeFunction' are the 5 least important features.
         # We will use the XGBoost results to save the list in the txt file.

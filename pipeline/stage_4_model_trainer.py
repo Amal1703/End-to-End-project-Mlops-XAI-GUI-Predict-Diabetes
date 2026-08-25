@@ -18,7 +18,7 @@ import random
 
 
 def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimizer,
-            lr, epochs, batch_size, X_train_scaled, y_train_2, X_val_scaled, y_val_2):
+        lr, epochs, batch_size, X_train_scaled, y_train_2, X_val_scaled, y_val_2):
 
     seed = 45
     random.seed(seed)
@@ -40,15 +40,15 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
 
 # Native early stopping, based on val_loss
     early_stop = EarlyStopping(monitor='val_loss',
-                                patience=10,
-                                restore_best_weights=True)
+                               patience=10,
+                               restore_best_weights=True)
 
 # Reduce LR by factor of 10 when validation loss plateaus
     reduce_lr = ReduceLROnPlateau(monitor='val_loss',
-        factor=0.1,  # Divide by 10 (multiply by 0.1)
-        patience=5,  # Wait 5 epochs before reducing
-        min_lr=1e-7,  # Minimum learning rate
-        verbose=2)
+                                  factor=0.1,  # Divide by 10 (multiply by 0.1)
+                                  patience=5,  # Wait 5 epochs before reducing
+                                  min_lr=1e-7,  # Minimum learning rate
+                                  verbose=2)
 
 # Training
     history = model_ANN.fit(
@@ -66,7 +66,7 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
     plt.plot(epochs, history.history['loss'], label='Train loss')
     plt.plot(epochs, history.history['val_loss'], label='Validation loss')
     plt.axvline(best_epoch, color='red', linestyle='--', alpha=0.7,
-            label=f'Meilleure epoch restaurée ({best_epoch})')
+                label=f'Meilleure epoch restaurée ({best_epoch})')
     plt.ylabel('Loss')
     plt.title('Train vs Validation Loss')
     plt.legend()
@@ -168,7 +168,7 @@ class ModelTrainer:
         with open(self.config["model_trainer"]["test_size_value_file"], "w") as f:
             f.write(str(test_size) + "\n")
 
-    def XGBoost_evaluate_feature_drop (self) -> None :
+    def XGBoost_evaluate_feature_drop(self) -> None :
 
         if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
             print("File train.csv doesn't exist, you need to split data")
@@ -198,7 +198,7 @@ class ModelTrainer:
             print("drop features", drop_feature)
             X_train_1 = X_train.drop(drop_feature, axis=1)
             X_test_1 = X_test.drop(drop_feature, axis=1)
-            errors, n_errors = XGBoost (X_train_1, X_test_1, y_train, y_test, n_estimators)
+            errors, n_errors = XGBoost(X_train_1, X_test_1, y_train, y_test, n_estimators)
             error_rate.append(n_errors)
             if i < len(self.list_feature_drop):
                 drop_feature.append(self.list_feature_drop[i])
@@ -211,7 +211,7 @@ class ModelTrainer:
         print(f"The features removed using XGBoost correspond to the lowest error rate: {self.list_feature_drop[:ModelTrainer.min_index]}")
         print("For other training models, those features will be eliminated")
 
-    def SVM_evaluate_feature_drop (self) -> None :
+    def SVM_evaluate_feature_drop(self) -> None :
 
         if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
             print("File train.csv doesn't exist, split data")
@@ -240,7 +240,7 @@ class ModelTrainer:
                 print("gamma value in params.yaml:", gamma)
 
         print("For SVM training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])
-        SVM (X_train_1, X_test_1, y_train, y_test, C, gamma)
+        SVM(X_train_1, X_test_1, y_train, y_test, C, gamma)
 
     def ANN_evaluate_feature_drop(self) -> None :
 
@@ -316,7 +316,7 @@ class ModelTrainer:
         search_false_positives_or_false_negatives_in_predictions(y_pred_ANN, y_test)
 
         # Save ANN model and scaler
-        joblib.dump (model_ANN, self.config["model_trainer"]["model_path"])
+        joblib.dump(model_ANN, self.config["model_trainer"]["model_path"])
         joblib.dump(scaler, self.config["model_trainer"]['scaler_path'])
         print("")
         print("model ANN and scaler are saved")

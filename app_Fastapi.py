@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import create_model, Field, ValidationError
-import re
 import subprocess
 from pipeline.stage_6_predict_new_data import PredictNewData
 import uvicorn
@@ -21,6 +20,7 @@ def validated_data():
             fields[col] = (float, Field(default=0, gt=0))
     model = create_model("PatientData", **fields)
     return model, feature_names
+
 
 validated_data_model, FEATURE_NAMES = validated_data()
 
@@ -103,7 +103,7 @@ async def pipeline_predict(request: Request):
             prediction = PredictNewData().predict_new_data(**input_values)
 
             return templates.TemplateResponse('results.html',
-                                                {
+                                              {
                                                     "request": request,
                                                     "prediction": (prediction)
                                                 })
@@ -112,9 +112,9 @@ async def pipeline_predict(request: Request):
     # GET, no button recognized -> display the empty form
         feature_names = FEATURE_NAMES
         return templates.TemplateResponse('predict.html',
-                                        {"request": request,
-                                            "feature_names": feature_names,
-                                            "values": 0
+                                          {"request": request,
+                                           "feature_names": feature_names,
+                                           "values": 0
                                         })
 
 

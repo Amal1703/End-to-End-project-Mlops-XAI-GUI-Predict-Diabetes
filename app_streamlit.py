@@ -98,7 +98,7 @@ def display_results(func, title=""):
     st.session_state.log_output += entry
 
 
-def render_toggle_stage_button (i) :
+def render_toggle_stage_button(i) :
     """ Renders a Streamlit button for stage `i` that acts as a collapsible toggle
 
         The button label combines the stage's name with a directional arrow
@@ -112,13 +112,13 @@ def render_toggle_stage_button (i) :
     """
 
     stage_name = ["📊 Data validation ", "🔧 Data transformation", "1: Filter methods",
-                    "2: Embedded methods", "🧠 Model trainer", "🎯 Diabetes Prediction with ANN"]
+                  "2: Embedded methods", "🧠 Model trainer", "🎯 Diabetes Prediction with ANN"]
 
     session_state = ["show_validation", "show_transformation", "show_Filter_methods",
-                        "show_Embedded_methods", "show_Model_trainer", "show_predict"]
+                     "show_Embedded_methods", "show_Model_trainer", "show_predict"]
 
     key = ["btn2", "btn3", "btn_Filter_methods",
-            "btn_Embedded_methods", "btn4", "btn6"]
+           "btn_Embedded_methods", "btn4", "btn6"]
 
     arrow = "▲" if st.session_state[session_state[i]] else "▼"
     if st.button(stage_name[i] +"  "+  f"{arrow}", use_container_width=True, key=key[i]):
@@ -190,7 +190,7 @@ with col2:
     if "show_validation" not in st.session_state:
         st.session_state["show_validation"] = False
 
-    render_toggle_stage_button (0)  # Data validation
+    render_toggle_stage_button(0)  # Data validation
 
     if st.session_state["show_validation"]:
         if st.button("1: Visualize data and display the number of missing value"):
@@ -210,7 +210,7 @@ with col3:
     if "show_transformation" not in st.session_state:
         st.session_state["show_transformation"] = False
 
-    render_toggle_stage_button (1)  # Data transformation
+    render_toggle_stage_button(1)  # Data transformation
 
     if st.session_state["show_transformation"]:
         with st.container(key="sub_buttons"):
@@ -223,7 +223,7 @@ with col3:
                 if "show_Filter_methods" not in st.session_state:
                     st.session_state["show_Filter_methods"] = False
 
-                render_toggle_stage_button (2)  # Filter methods
+                render_toggle_stage_button(2)  # Filter methods
 
                 if st.session_state["show_Filter_methods"]:
 
@@ -240,7 +240,7 @@ with col3:
                 if "show_Embedded_methods" not in st.session_state:
                     st.session_state["show_Embedded_methods"] = False
 
-                render_toggle_stage_button (3)  # Embedded methods
+                render_toggle_stage_button(3)  # Embedded methods
 
                 if st.session_state["show_Embedded_methods"]:
 
@@ -260,7 +260,7 @@ with col4:
     if "show_Model_trainer" not in st.session_state:
         st.session_state["show_Model_trainer"] = False
 
-    render_toggle_stage_button (4)
+    render_toggle_stage_button(4)
 
     if st.session_state["show_Model_trainer"]:
         if st.button("1: Split data into training and test sets"):
@@ -298,7 +298,7 @@ with col6:
     if "show_predict" not in st.session_state:
         st.session_state["show_predict"] = False
 
-    render_toggle_stage_button (5)
+    render_toggle_stage_button(5)
 
     if st.session_state["show_predict"]:
 
