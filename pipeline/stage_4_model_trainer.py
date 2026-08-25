@@ -6,8 +6,8 @@ import os
 import joblib
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-import xgboost as xgb # XGboost
-from sklearn.svm import SVC # SVM
+import xgboost as xgb  # XGboost
+from sklearn.svm import SVC  # SVM
 # ANN
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -18,7 +18,7 @@ import random
 
 
 def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimizer,
-            lr, epochs, batch_size, X_train_scaled, y_train_2,X_val_scaled, y_val_2):
+            lr, epochs, batch_size, X_train_scaled, y_train_2, X_val_scaled, y_val_2):
 
     seed = 45
     random.seed(seed)
@@ -26,17 +26,17 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
     tf.random.set_seed(seed)
 
     model_ANN = Sequential([
-    Dense(hidden_layer_sizes[0], activation=activation_hidden_layer, kernel_regularizer=l2_reg(l2), input_shape=(X_train_scaled.shape[1],)),
-    Dropout(dropout_values[0]),
-    Dense(hidden_layer_sizes[1], activation=activation_hidden_layer, kernel_regularizer=l2_reg(l2)),
-    Dropout(dropout_values[1]),
-    Dense(1, activation='sigmoid')  # Binary output; for multi-class use softmax with n_classes
+        Dense(hidden_layer_sizes[0], activation=activation_hidden_layer, kernel_regularizer=l2_reg(l2), input_shape=(X_train_scaled.shape[1],)),
+        Dropout(dropout_values[0]),
+        Dense(hidden_layer_sizes[1], activation=activation_hidden_layer, kernel_regularizer=l2_reg(l2)),
+        Dropout(dropout_values[1]),
+        Dense(1, activation='sigmoid')  # Binary output; for multi-class use softmax with n_classes
                                 ])
 
     model_ANN.compile(
-    optimizer=getattr(tf.keras.optimizers, optimizer)(learning_rate=lr),
-    loss='binary_crossentropy',   # 'sparse_categorical_crossentropy' for multi-class
-    metrics=['accuracy'])
+        optimizer=getattr(tf.keras.optimizers, optimizer)(learning_rate=lr),
+        loss='binary_crossentropy',   # 'sparse_categorical_crossentropy' for multi-class
+        metrics=['accuracy'])
 
 # Native early stopping, based on val_loss
     early_stop = EarlyStopping(monitor='val_loss',
@@ -52,18 +52,18 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
 
 # Training
     history = model_ANN.fit(
-    X_train_scaled, y_train_2,
-    validation_data=(X_val_scaled, y_val_2),
-    epochs=epochs,
-    batch_size=batch_size,
-    shuffle=True,
-    callbacks=[early_stop, reduce_lr])
+        X_train_scaled, y_train_2,
+        validation_data=(X_val_scaled, y_val_2),
+        epochs=epochs,
+        batch_size=batch_size,
+        shuffle=True,
+        callbacks=[early_stop, reduce_lr])
 
 # --- Plot loss train vs val ---
     best_epoch = len(history.history['loss']) - early_stop.patience
     epochs = range(1, len(history.history['loss']) + 1)
     plt.figure(figsize=(8, 5))
-    plt.plot(epochs,history.history['loss'], label='Train loss')
+    plt.plot(epochs, history.history['loss'], label='Train loss')
     plt.plot(epochs, history.history['val_loss'], label='Validation loss')
     plt.axvline(best_epoch, color='red', linestyle='--', alpha=0.7,
             label=f'Meilleure epoch restaurée ({best_epoch})')
@@ -76,24 +76,23 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
     return model_ANN
 
 def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None :
-        # Normalization
-        scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train_1)
-        X_test_scaled = scaler.transform(X_test_1)
-        svm_model = SVC(kernel="rbf", C=C, gamma=gamma, random_state=42)
-        svm_model.fit(X_train_scaled, y_train)
-        y_pred_svm = svm_model.predict(X_test_scaled)
-        calculate_errors(y_pred_svm, y_test)
-        search_false_positives_or_false_negatives_in_predictions(y_pred_svm, y_test)
-
+    # Normalization
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train_1)
+    X_test_scaled = scaler.transform(X_test_1)
+    svm_model = SVC(kernel="rbf", C=C, gamma=gamma, random_state=42)
+    svm_model.fit(X_train_scaled, y_train)
+    y_pred_svm = svm_model.predict(X_test_scaled)
+    calculate_errors(y_pred_svm, y_test)
+    search_false_positives_or_false_negatives_in_predictions(y_pred_svm, y_test)
 
 
 def XGBoost(X_train, X_test, y_train, y_test, n_estimators) -> None :
-        xgb_model = xgb.XGBClassifier(n_estimators=n_estimators, random_state=42)
-        xgb_model.fit(X_train, y_train)
-        y_pred_xgb = xgb_model.predict(X_test)
-        errors, n_errors = calculate_errors(y_pred_xgb, y_test)
-        return errors, n_errors
+    xgb_model = xgb.XGBClassifier(n_estimators=n_estimators, random_state=42)
+    xgb_model.fit(X_train, y_train)
+    y_pred_xgb = xgb_model.predict(X_test)
+    errors, n_errors = calculate_errors(y_pred_xgb, y_test)
+    return errors, n_errors
 
 
 def read_file(file_path):
@@ -101,7 +100,7 @@ def read_file(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
-            lines = [item.rstrip('\n') for item in lines] # delete \n
+            lines = [item.rstrip('\n') for item in lines]  # delete \n
 
             if not lines:
                 print("❌ The file is empty")
@@ -113,24 +112,23 @@ def read_file(file_path):
     return lines
 
 def search_false_positives_or_false_negatives_in_predictions(y_pred, y_test) -> None:
-        y_test_arr = np.array(y_test).flatten()
-        false_positives_idx = np.where((y_pred == 1) & (y_test_arr == 0))[0]
-        false_negatives_idx = np.where((y_pred == 0) & (y_test_arr == 1))[0]
-        print(f"False positives (predicted diabetic, but not): {len(false_positives_idx)}")
-        print(f"False negatives (predicted non-diabetic, but actually is): {len(false_negatives_idx)}")
+    y_test_arr = np.array(y_test).flatten()
+    false_positives_idx = np.where((y_pred == 1) & (y_test_arr == 0))[0]
+    false_negatives_idx = np.where((y_pred == 0) & (y_test_arr == 1))[0]
+    print(f"False positives (predicted diabetic, but not): {len(false_positives_idx)}")
+    print(f"False negatives (predicted non-diabetic, but actually is): {len(false_negatives_idx)}")
 
 def calculate_errors(y_pred, y_test)  -> None:
-        errors = np.abs(y_pred - y_test.values)
-        n_errors = (errors == 1).sum()
-        print(f"Number of errors: {n_errors} / {len(y_test)}")
-        print(f"Error rate: {n_errors / len(y_test):.2%}")
+    errors = np.abs(y_pred - y_test.values)
+    n_errors = (errors == 1).sum()
+    print(f"Number of errors: {n_errors} / {len(y_test)}")
+    print(f"Error rate: {n_errors / len(y_test):.2%}")
 
-        return errors, n_errors
+    return errors, n_errors
 
 class ModelTrainer:
     # Shared variables for all functions
     min_index = 0  #  Corresponds to the index that shows the minimum error rate after dropping the features using XGBoost
-
 
     def __init__(self, config_path: str = "yaml file/config.yaml", schema_filepath: str = "yaml file/schema.yaml", params_filepath: str = "yaml file/params.yaml"):
         self.config = load_yaml_config(config_path)
@@ -143,7 +141,6 @@ class ModelTrainer:
         self.y = self.df[self.target]
         self.df_train = None
         self.df_test = None
-
 
     def split_data_train_test(self, test_size) -> None:
 
@@ -170,7 +167,6 @@ class ModelTrainer:
         os.makedirs(os.path.dirname(self.config["model_trainer"]["test_size_value_file"]) or ".", exist_ok=True)
         with open(self.config["model_trainer"]["test_size_value_file"], "w") as f:
             f.write(str(test_size) + "\n")
-
 
     def XGBoost_evaluate_feature_drop (self) -> None :
 
@@ -246,7 +242,6 @@ class ModelTrainer:
         print("For SVM training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])
         SVM (X_train_1, X_test_1, y_train, y_test, C, gamma)
 
-
     def ANN_evaluate_feature_drop(self) -> None :
 
         if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
@@ -308,10 +303,10 @@ class ModelTrainer:
                 lr = item['params']["lr"]
 
         model_ANN = ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimizer,
-                        lr, epochs, batch_size, X_train_scaled, y_train_2,X_val_scaled, y_val_2)
+                        lr, epochs, batch_size, X_train_scaled, y_train_2, X_val_scaled, y_val_2)
 
         # Prediction
-        y_pred_prob = model_ANN.predict(X_test_scaled,verbose=0)
+        y_pred_prob = model_ANN.predict(X_test_scaled, verbose=0)
 
         # Conversion with threshold at 0.5 (standard)
         y_pred_ANN = (y_pred_prob.flatten() > 0.5).astype(int)

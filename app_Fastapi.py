@@ -46,7 +46,6 @@ async def pipeline_predict(request: Request):
 
     if request.method == 'POST':
 
-
         # case 1: "Pipeline" button was clicked
         if 'pipeline' in form:
             try:
@@ -63,23 +62,23 @@ async def pipeline_predict(request: Request):
 
             try:
 
-               form_dict = dict(form)
-               model_fields = set(validated_data_model.model_fields.keys())
-               # only keep the fields that the model expects ('predict' excluded)
-               filtered_data = {k: v for k, v in form_dict.items() if k in model_fields}
+                form_dict = dict(form)
+                model_fields = set(validated_data_model.model_fields.keys())
+                # only keep the fields that the model expects ('predict' excluded)
+                filtered_data = {k: v for k, v in form_dict.items() if k in model_fields}
 
-              # check whether filtered_data is empty
-               if not filtered_data:
-                 # add default values or return an error
-                 return templates.TemplateResponse("predict.html", {
-                     "request": request,
-                     "feature_names": feature_names,
-                     "errors": errors,
-                     "values": form_dict
-                 })
+               # check whether filtered_data is empty
+                if not filtered_data:
+                    # add default values or return an error
+                    return templates.TemplateResponse("predict.html", {
+                        "request": request,
+                        "feature_names": feature_names,
+                        "errors": errors,
+                        "values": form_dict
+                    })
 
-               # validation based on column type
-               data = validated_data_model(**filtered_data)
+                # validation based on column type
+                data = validated_data_model(**filtered_data)
 
             except ValidationError as e:
                 # convert Pydantic validation errors to a {field: message} dictionary
@@ -89,7 +88,7 @@ async def pipeline_predict(request: Request):
 
             if errors:
                 return templates.TemplateResponse(
-                "predict.html",
+                    "predict.html",
                         {
                             "request": request,
                             "feature_names": feature_names,
@@ -105,8 +104,8 @@ async def pipeline_predict(request: Request):
 
             return templates.TemplateResponse('results.html',
                                                 {
-                                                "request": request,
-                                                "prediction": (prediction)
+                                                    "request": request,
+                                                    "prediction": (prediction)
                                                 })
 
     else:

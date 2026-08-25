@@ -55,7 +55,7 @@ def pipeline_predict():
                     else:
                         input_values[col] = float(raw_value)
 
-            session['last_values'] = request.form.to_dict() # the values from the user are saved in the predict fields
+            session['last_values'] = request.form.to_dict()  # the values from the user are saved in the predict fields
 
             if errors:
                 return render_template(

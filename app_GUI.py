@@ -83,7 +83,6 @@ class ConsoleRedirector:
             self.widget_text.see(tk.END)
         self.widget_text.update_idletasks()
 
-
     def flush(self):
         pass  # required by the sys.stdout interface, nothing to do here
 
@@ -157,7 +156,6 @@ class App(tk.Tk):
 
         self.show_menu(MENU)
 
-
     def clear_frame(self):
         for widget in self.frame.winfo_children():
             widget.destroy()
@@ -189,8 +187,8 @@ class App(tk.Tk):
     def click(self, content, text):
         if isinstance(content, AskForValue):
             # First, prompt the user for a test size value using a popup dialog
-            test_size_value = prompt_input(self,"Test size", "Enter any decimal value between 0 and 1", "0.2")
-            test_size_value = float(test_size_value.replace(',', '.').strip()) if test_size_value.replace(',', '.').strip().replace('.', '').isdigit() else test_size_value # type(test_size_value) = str
+            test_size_value = prompt_input(self, "Test size", "Enter any decimal value between 0 and 1", "0.2")
+            test_size_value = float(test_size_value.replace(',', '.').strip()) if test_size_value.replace(',', '.').strip().replace('.', '').isdigit() else test_size_value  # type(test_size_value) = str
 
             if (type(test_size_value) == float) and (0 < test_size_value < 1):
                 print(f"--- {text} (Entered value : {test_size_value}) ---")
@@ -216,7 +214,6 @@ class App(tk.Tk):
         else:
             # final result (static text): we display it
             print(content)
-
 
     def back(self):
         self.historic.pop()

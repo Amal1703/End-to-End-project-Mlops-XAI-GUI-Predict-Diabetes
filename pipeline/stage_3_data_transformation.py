@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
-from sklearn.feature_selection import f_classif # ANOVA F-test
-from sklearn.feature_selection import mutual_info_classif # Mutual Information
-import xgboost as xgb # XGboost
-from sklearn.ensemble import RandomForestClassifier # Random Forest
+from sklearn.feature_selection import f_classif  # ANOVA F-test
+from sklearn.feature_selection import mutual_info_classif  # Mutual Information
+import xgboost as xgb  # XGboost
+from sklearn.ensemble import RandomForestClassifier  # Random Forest
 
 
 class DataTransformation:
@@ -29,7 +29,6 @@ class DataTransformation:
         plt.title("Correlation Matrix")
         plt.show()
 
-
     def ANOVA_F_test(self) -> None:
         # Calculate F-scores and p-value
         f_scores, p_values = f_classif(self.X, self.y)
@@ -41,7 +40,6 @@ class DataTransformation:
         for i in results:
             print(f"{self.X.columns[i]}: F-score = {f_scores[i]:.4f},\
                     p-value = {p_values[i]:.4f}")
-
 
     def mutual_information(self) -> None:
         # Calculate MI for all columns
@@ -61,14 +59,12 @@ class DataTransformation:
         importance = pd.Series(rf.feature_importances_, index=self.X.columns).sort_values(ascending=False)
         print(importance)
 
-
     def XGBoost(self):
         xgb_model = xgb.XGBClassifier(n_estimators=200, random_state=42)
         xgb_model.fit(self.X, self.y)
         importance = pd.Series(xgb_model.feature_importances_, index=self.X.columns).sort_values(ascending=False)
         print(importance)
         return importance
-
 
     def save_least_important_features_to_file (self) -> None:
         # Based on the results from all methods:

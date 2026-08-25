@@ -29,7 +29,6 @@ class XAI:
 
         self.feature_names = list(self.X_train.columns)
 
-
     def SHAP(self) -> None:
 
         # Create the explainer
