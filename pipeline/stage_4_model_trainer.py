@@ -51,7 +51,7 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
                                   factor=0.1,  # Divide by 10 (multiply by 0.1)
                                   patience=5,  # Wait 5 epochs before reducing
                                   min_lr=1e-7,  # Minimum learning rate
-                                  verbose=2)
+                                  verbose=0)
 
 # Training
     history = model_ANN.fit(

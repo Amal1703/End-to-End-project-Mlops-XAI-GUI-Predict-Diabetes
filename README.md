@@ -8,8 +8,6 @@ In this project, I have created 4 applications: GUI, Flask, Streamlit and Fastap
    - XAI 
    - diabetes prediction
 
-!!! dif    GUI, 
-Flask and Streamlit fatapi 
 
 ### The dataset folder containing Predict Diabetes data was downloaded from: //www.kaggle.com/datasets/hasibur013/diabetes-dataset
 
@@ -100,9 +98,22 @@ python app_Fastapi.py
     - Create a .dockerignore file to exclude other apps and unnecessary folders for the Docker image
     - In requirements.txt, comment out the following libraries (as they are not needed for deployment): notebook, flask, fastapi, python-multipart, itsdangerous, lime.
 
-12. creer et remplir le fichier CI:Cd, qui est le fichier main.yaml dans (.github\workflows), # Add secrets to GitHub (Settings → Secrets and variables → Actions) cliquer sur New repository secret) et ajoute les nmaes et leurs secret
-Exple cliquer sur New repository secret:  Name GCP_REGION et secret  europe-west9
+12. Create and fill in the CI/CD file, which is the main.yaml file in (.github\workflows). Add secrets to GitHub (Settings → Secrets and variables → Actions → click the "New repository secret" button and add the names and their secrets).
+   - Example: click on New repository secret: Name GCP_REGION and secret europe-west9
 
+For secrets.GCP_SA_KEY: you need to execute these 4 commands in order:
+
+ - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:github-deployer@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/run.admin"
+
+ - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:github-deployer@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/artifactregistry.writer"
+
+ - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:github-deployer${PROJECT_ID}.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser"
+
+ - gcloud iam service-accounts keys create key.json --iam-account=github-deployer@${PROJECT_ID}.iam.gserviceaccount.com
+
+=> key.json will be created in the folder. We have added key.json to .gitignore and .dockerignore
+
+=> On GitHub repo, go to Settings → Secrets and variables → Actions → click the "New repository secret" button. In the Name field, enter exactly GCP_SA_KEY. In the Secret field, paste the copied JSON content. Click "Add secret"
 
 
 ### Deploying a Streamlit application on Google Cloud Console
@@ -136,6 +147,3 @@ Exple cliquer sur New repository secret:  Name GCP_REGION et secret  europe-west
 
 7. After a successful deployment (no errors), the deployment command will output the public URL of your service directly in the terminal. It will look like: https://SERVICE_NAME-xxxxx-REGION.a.run.app
 You can view the URL and logs in the Google Cloud Console
-
-
-
