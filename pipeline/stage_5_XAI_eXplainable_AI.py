@@ -44,29 +44,28 @@ class XAI:
 
         # --- Summary plot for class 1  ---
         shap.summary_plot(shap_values,
-            self.X_test_scaled,
-            plot_type="bar",
-            feature_names=self.feature_names,
-            show=False)
-        
+                            self.X_test_scaled,
+                            plot_type="bar",
+                            feature_names=self.feature_names,
+                            show=False)
+
         plt.show()
 
         # --- Summary plot for class 0 (just with the opposite sign) ---
         shap_values_class0 = shap.Explanation(values=-shap_values.values,  # opposite sign
-            base_values=1 - shap_values.base_values,  # base_value is also inverted
-            data=shap_values.data,
-            feature_names=self.feature_names)
+                                                base_values=1 - shap_values.base_values,  # base_value is also inverted
+                                                data=shap_values.data,
+                                                feature_names=self.feature_names)
 
         plt.figure()
         plt.title("Fig 2: SHAP - Importance of features (class 0: non-diabetic)")
         plt.tight_layout()
 
         shap.summary_plot(shap_values_class0,
-            self.X_test_scaled,
-            plot_type="bar",
-            feature_names=self.feature_names,
-            show=False)
+                            self.X_test_scaled,
+                            plot_type="bar",
+                            feature_names=self.feature_names,
+                            show=False)
 
         plt.show()
-
 # we can add Lime method (see test.py)

@@ -11,44 +11,44 @@ from pipeline.stage_5_XAI_eXplainable_AI import XAI
 def prompt_input(parent, title, message, default_value=""):
 
     result = {"value": None}
-    
+
     dialog = tk.Toplevel(parent)
     dialog.title(title)
     dialog.geometry("350x150")
     dialog.resizable(False, False)
-    
+
     # Center the window
     dialog.transient(parent)
     dialog.grab_set()
-    
+
     # Message
     tk.Label(dialog, text=message, font=("Arial", 10)).pack(pady=10)
-    
+
     # Entry field
     entry_var = tk.StringVar(value=default_value)
     entry = tk.Entry(dialog, textvariable=entry_var, width=40, font=("Arial", 10))
     entry.pack(pady=10)
     entry.focus_set()
     entry.select_range(0, tk.END)
-    
+
     def on_ok():
         result["value"] = entry_var.get()
         dialog.destroy()
-    
+
     def on_cancel():
         dialog.destroy()
-    
+
     # Buttons
     btn_frame = tk.Frame(dialog)
     btn_frame.pack(pady=10)
-    
+
     tk.Button(btn_frame, text="OK", command=on_ok, width=10, bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=10)
     tk.Button(btn_frame, text="Annuler", command=on_cancel, width=10, bg="#f44336", fg="white").pack(side=tk.LEFT, padx=10)
-    
+
     # Enter shortcut
     entry.bind('<Return>', lambda e: on_ok())
     entry.bind('<Escape>', lambda e: on_cancel())
-    
+
     parent.wait_window(dialog)
 
     return result["value"]
@@ -57,7 +57,7 @@ def prompt_input(parent, title, message, default_value=""):
 # Represents a button that must first ASK the user for a value
 # (via a dialog box), then call callback(value) with what was entered
 # ---------------------------------------------------------
-class AskForValue: 
+class AskForValue:
     def __init__(self, callback, type_="float"):
         """
     callback : function called with the entered value -> callback(value)
@@ -111,14 +111,14 @@ MENU = {
             "ANOVA F test": lambda: DataTransformation().ANOVA_F_test(),
         },
 
-        "Embedded methods": { 
+        "Embedded methods": {
             "Random forest": lambda: DataTransformation().random_forest(),
             "XGBoost": lambda: DataTransformation().XGBoost(),
         },
 
         "Show and save the 5 least important features to a file (based on XGBoost)": lambda: DataTransformation().save_least_important_features_to_file(),
     },
-    
+
     "Model_trainer": {
         "Split data into training and test sets": AskForValue(
             callback=lambda test_size: ModelTrainer().split_data_train_test(test_size),
@@ -166,7 +166,7 @@ class App(tk.Tk):
         """Shows the buttons for the current menu"""
         self.clear_frame()
 
-        for text, content in current_menu.items():  
+        for text, content in current_menu.items():
             btn = tk.Button(
                 self.frame,
                 text=text,
@@ -182,17 +182,17 @@ class App(tk.Tk):
         # Back button if not at the root menu
         if self.historic:
             back_button = tk.Button(
-                self.frame, text="⬅ Back", width=25, command=self.back  
+                self.frame, text="⬅ Back", width=25, command=self.back
             )
             back_button.pack(pady=15)
 
-    def click(self, content, text): 
+    def click(self, content, text):
         if isinstance(content, AskForValue):
             # First, prompt the user for a test size value using a popup dialog
             test_size_value = prompt_input(self,"Test size", "Enter any decimal value between 0 and 1", "0.2")
             test_size_value = float(test_size_value.replace(',', '.').strip()) if test_size_value.replace(',', '.').strip().replace('.', '').isdigit() else test_size_value # type(test_size_value) = str
-            
-            if (type(test_size_value) == float) and ( 0 < test_size_value < 1):
+
+            if (type(test_size_value) == float) and (0 < test_size_value < 1):
                 print(f"--- {text} (Entered value : {test_size_value}) ---")
             try:
                 content.callback(test_size_value)
@@ -227,4 +227,4 @@ class App(tk.Tk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
-    
+

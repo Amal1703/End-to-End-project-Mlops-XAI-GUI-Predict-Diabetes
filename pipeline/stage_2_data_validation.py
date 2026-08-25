@@ -38,7 +38,7 @@ class DataValidation:
             print("type_invalid:", type_mismatches)
 
     # Visualize data and display the number of missing values
-    def explore_data (self) -> None: 
+    def explore_data (self) -> None:
         print("Visualize data\n", self.df.head())
         print("rows, column:", self.df.shape)
         print("")
@@ -46,15 +46,15 @@ class DataValidation:
         print("\nData columns and their type")
         print(self.df.info()) # data columns and their type
 
-    # Visualize the distribution of a target variable (outcome) 
-    def visualize_distribution_target_variable (self) -> None: 
+    # Visualize the distribution of a target variable (outcome)
+    def visualize_distribution_target_variable (self) -> None:
         sns.countplot(x=self.df[self.target], data=self.df)
         plt.title("Distribution of the target variable (outcome)")
         plt.show()
 
     # Plot histograms showing the distribution of all features for each category of a target variable
-    def plot_histogram_each_column(self) -> None: 
-        
+    def plot_histogram_each_column(self) -> None:
+
         # Plot histograms showing the distribution of the feature for each category of a target variable
         def plotHistogram(values, label, feature, title, fig_num):
             sns.set_style("whitegrid")
@@ -65,7 +65,7 @@ class DataValidation:
             plotOne.set_axis_labels(feature, 'Proportion')
             plotOne.fig.suptitle(f'Fig {fig_num}: {title}')
             plotOne.fig.canvas.manager.set_window_title(f'Fig {fig_num}')  # names the window "Fig 1", "Fig 2", etc.
-        
+
         name_cols = self.df.select_dtypes(include="number").columns
         for i, col in enumerate(name_cols, start=1):
             plotHistogram(self.df, self.target, col, f'{col} (Blue = Healthy; Orange = Diabetes)', i)
@@ -73,4 +73,4 @@ class DataValidation:
         plt.show()  # shows ALL figures (fig1...fign) at once, at the end
 
 
-# We can add a function to Boxplots for outlier detection (see test.py)            
+# We can add a function to Boxplots for outlier detection (see test.py)

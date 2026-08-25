@@ -24,10 +24,10 @@ if "show_dialog" not in st.session_state:
     st.session_state.show_dialog = False
 
 if "dialog_action" not in st.session_state:
-    st.session_state.dialog_action = False 
+    st.session_state.dialog_action = False
 
 if "log_output" not in st.session_state:
-    st.session_state.log_output = ""    
+    st.session_state.log_output = ""
 
 
 def _dialog_content():
@@ -58,11 +58,11 @@ def _dialog_content():
             st.rerun()
             return None
 
-    return None       
+    return None
 
 
 def display_results(func, title=""):
-    """Display the print() outputs of a function "func" and its matplotlib plots"""    
+    """Display the print() outputs of a function "func" and its matplotlib plots"""
     buffer = io.StringIO()
     with redirect_stdout(buffer):
         func()
@@ -77,7 +77,7 @@ def display_results(func, title=""):
 
     # Store the logs (results)
     timestamp = datetime.now().strftime("%H:%M:%S")
-    
+
     if plt.get_fignums():
         entry =  (
         f"\n{'='*70}\n"
@@ -100,7 +100,7 @@ def display_results(func, title=""):
     st.session_state.log_output += entry
 
 
-def render_toggle_stage_button ( i ) :
+def render_toggle_stage_button (i) :
     """ Renders a Streamlit button for stage `i` that acts as a collapsible toggle
     
         The button label combines the stage's name with a directional arrow
@@ -113,17 +113,17 @@ def render_toggle_stage_button ( i ) :
             corresponding lists (stage_name, session_state, key).
     """
 
-    stage_name = [  "📊 Data validation ", "🔧 Data transformation", "1: Filter methods",
+    stage_name = ["📊 Data validation ", "🔧 Data transformation", "1: Filter methods",
                     "2: Embedded methods", "🧠 Model trainer", "🎯 Diabetes Prediction with ANN"]
-    
-    session_state = [  "show_validation", "show_transformation", "show_Filter_methods",
+
+    session_state = ["show_validation", "show_transformation", "show_Filter_methods",
                         "show_Embedded_methods", "show_Model_trainer", "show_predict"]
 
-    key = [ "btn2", "btn3", "btn_Filter_methods",
+    key = ["btn2", "btn3", "btn_Filter_methods",
             "btn_Embedded_methods", "btn4", "btn6"]
 
     arrow = "▲" if st.session_state[session_state[i]] else "▼"
-    if st.button( stage_name[i] +"  "+  f"{arrow}", use_container_width=True, key=key[i]):
+    if st.button(stage_name[i] +"  "+  f"{arrow}", use_container_width=True, key=key[i]):
         st.session_state[session_state[i]] = not st.session_state[session_state[i]]
         st.rerun()   # force an immediate rerun to sync the display upon this click
 
@@ -179,8 +179,8 @@ st.markdown("""
 st.title("📋 Diabetes Prediction Pipeline")
 
 # Define 6 buttons
-col1, col2, col3 = st.columns(3) 
-col4, col5, col6 = st.columns(3) 
+col1, col2, col3 = st.columns(3)
+col4, col5, col6 = st.columns(3)
 
 
 with col1:
@@ -188,13 +188,13 @@ with col1:
         display_results(lambda: DataIngestion().extract_zip_file(),title="Data ingestion")
 
 with col2:
-    
+
     if "show_validation" not in st.session_state:
         st.session_state["show_validation"] = False
-    
+
     render_toggle_stage_button (0)  # Data validation
 
-    if st.session_state["show_validation"]:  
+    if st.session_state["show_validation"]:
         if st.button("1: Visualize data and display the number of missing value"):
             display_results(lambda: DataValidation().explore_data(),title="Visualize data and display the number of missing value")
 
@@ -203,40 +203,40 @@ with col2:
 
         if st.button("3: Visualize the distribution of a target variable (outcome)"):
             display_results(lambda: DataValidation().visualize_distribution_target_variable(),title="Visualize the distribution of a target variable (outcome)")
-            
+
         if st.button("4: Plot histograms showing the distribution of all features for each category of a target variable"):
             display_results(lambda: DataValidation().plot_histogram_each_column(),title="Plot histograms showing the distribution of all features for each category of a target variable")
-            
-with col3:      
-    
+
+with col3:
+
     if "show_transformation" not in st.session_state:
-        st.session_state["show_transformation"] = False  
-        
+        st.session_state["show_transformation"] = False
+
     render_toggle_stage_button (1) # Data transformation
 
 
-    if st.session_state["show_transformation"]:   
+    if st.session_state["show_transformation"]:
         with st.container(key="sub_buttons"):
 
          # Define 3 buttons
          b1, b2 = st.columns(2, gap="small")
          b3 = st.columns(1)[0]
-            
+
          with b1:
             if "show_Filter_methods" not in st.session_state:
                 st.session_state["show_Filter_methods"] = False
 
             render_toggle_stage_button (2) # Filter methods
 
-            if st.session_state["show_Filter_methods"]: 
+            if st.session_state["show_Filter_methods"]:
 
-                if st.button("1: Correlation matrix"):     
+                if st.button("1: Correlation matrix"):
                         display_results(lambda: DataTransformation().correlation_matrix(),title="Correlation matrix")
-                
-                if st.button("2: Mutual information"):     
+
+                if st.button("2: Mutual information"):
                         display_results(lambda: DataTransformation().mutual_information(),title="Mutual information")
 
-                if st.button("3: ANOVA F test"):     
+                if st.button("3: ANOVA F test"):
                         display_results(lambda: DataTransformation().ANOVA_F_test(),title=" ANOVA F test")
 
 
@@ -246,27 +246,27 @@ with col3:
 
             render_toggle_stage_button (3) # Embedded methods
 
-            if st.session_state["show_Embedded_methods"]: 
+            if st.session_state["show_Embedded_methods"]:
 
-                if st.button("1: Random forest"):     
+                if st.button("1: Random forest"):
                         display_results(lambda: DataTransformation().random_forest(),title="Random forest")
 
-                if st.button("2: XGBoost"):     
+                if st.button("2: XGBoost"):
                         display_results(lambda: DataTransformation().XGBoost(),title="XGBoost")
 
          with b3:
-            if st.button("3: Show and save the 5 least important features to a file (based on XGBoost)"):     
+            if st.button("3: Show and save the 5 least important features to a file (based on XGBoost)"):
                     display_results(lambda: DataTransformation().save_least_important_features_to_file(),title="Show and save the 5 least important features to a file (based on XGBoost)")
 
 
 with col4:
-    
+
     if "show_Model_trainer" not in st.session_state:
         st.session_state["show_Model_trainer"] = False
 
-    render_toggle_stage_button (4)   
+    render_toggle_stage_button (4)
 
-    if st.session_state["show_Model_trainer"]:  
+    if st.session_state["show_Model_trainer"]:
         if st.button("1: Split data into training and test sets"):
                 st.session_state.show_dialog = True
                 st.session_state.dialog_action = None
@@ -275,8 +275,8 @@ with col4:
         # Open the dialog box
         if st.session_state.show_dialog == True:
                 test_size = _dialog_content()
-    
-        # Display the logs if dialog is closed and validated 
+
+        # Display the logs if dialog is closed and validated
         elif st.session_state.dialog_action == 'validated':
                 display_results(lambda: ModelTrainer().split_data_train_test(st.session_state.test_size),
                                 title="Split data into training and test sets")
@@ -288,7 +288,7 @@ with col4:
 
         if st.button("3: Train and evaluate SVM by dropping the features that were found by XGBoost to correspond to the lowest error rate"):
             display_results(lambda: ModelTrainer().SVM_evaluate_feature_drop(),title="Train and evaluate SVM by dropping the features that were found by XGBoost to correspond to the lowest error rate")
-            
+
         if st.button("4: Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate"):
             display_results(lambda: ModelTrainer().ANN_evaluate_feature_drop(),title="Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate")
 
@@ -299,14 +299,14 @@ with col5:
 
 
 with col6:
-    
+
     if "show_predict" not in st.session_state:
         st.session_state["show_predict"] = False
 
-    render_toggle_stage_button (5)  
+    render_toggle_stage_button (5)
 
     if st.session_state["show_predict"]:
-        
+
         input_values = {}
         feature_names, schema_columns = PredictNewData().get_input_column_X_train_and_schema()
 
@@ -323,11 +323,11 @@ with col6:
 
             elif col_type == "float64":
                 if not re.match(r'^-?\d+(\.\d+)?$', raw_value.strip()) or (float(raw_value) <= 0):
-                    st.error( f"{col} value must be a positive float")
+                    st.error(f"{col} value must be a positive float")
                 else:
                     input_values[col] = float(raw_value)
 
-        if st.session_state["show_predict"]:  
+        if st.session_state["show_predict"]:
                 if st.button("Diabetes Prediction using ANN"):
                     display_results(lambda: print("Diabetes Prediction (1: diabetes; 0: no diabetes): ",
                                     PredictNewData().predict_new_data(**input_values)),

@@ -8,19 +8,19 @@ from pipeline.stage_6_predict_new_data import PredictNewData
 
 
 # initialize a flask app
-app = Flask(__name__) 
+app = Flask(__name__)
 app.secret_key = 'Amal'  # necessary to use session
 
 
 # route to display the home page
-@app.route('/', methods=['GET'])  
+@app.route('/', methods=['GET'])
 def homePage():
     return render_template("home.html")
 
 
 @app.route('/predict_or_pipeline', methods=['POST', 'GET'])
 def pipeline_predict():
-    
+
     if request.method == 'POST':
 
         # case 1: "Pipeline" button was clicked
@@ -54,9 +54,9 @@ def pipeline_predict():
                         errors[col] = f"{col} value must be a positive float"
                     else:
                         input_values[col] = float(raw_value)
-                        
+
             session['last_values'] = request.form.to_dict() # the values from the user are saved in the predict fields
-            
+
             if errors:
                 return render_template(
                     'predict.html',
@@ -68,7 +68,7 @@ def pipeline_predict():
             # all values are valid -> make the prediction
             prediction = PredictNewData().predict_new_data(**input_values)
 
-            return render_template('results.html', prediction = str(prediction))
+            return render_template('results.html', prediction=str(prediction))
 
     # GET, no button recognized -> display the empty form
     feature_names, schema_columns = PredictNewData().get_input_column_X_train_and_schema()
@@ -81,4 +81,4 @@ if __name__ == "__main__":
 	# debug mode (for development only, never in production)
 	#app.run(host="0.0.0.0", port = 8080, debug=True)
 
-	app.run(host="0.0.0.0", port = 8080)
+	app.run(host="0.0.0.0", port=8080)

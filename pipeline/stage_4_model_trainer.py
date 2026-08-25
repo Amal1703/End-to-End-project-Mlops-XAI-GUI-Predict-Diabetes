@@ -17,7 +17,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 import random
 
 
-def ANN(   hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimizer,
+def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimizer,
             lr, epochs, batch_size, X_train_scaled, y_train_2,X_val_scaled, y_val_2):
 
     seed = 45
@@ -35,11 +35,11 @@ def ANN(   hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, opti
 
     model_ANN.compile(
     optimizer=getattr(tf.keras.optimizers, optimizer)(learning_rate=lr),
-    loss='binary_crossentropy',   # 'sparse_categorical_crossentropy' for multi-class 
+    loss='binary_crossentropy',   # 'sparse_categorical_crossentropy' for multi-class
     metrics=['accuracy'])
 
 # Native early stopping, based on val_loss
-    early_stop = EarlyStopping( monitor='val_loss',
+    early_stop = EarlyStopping(monitor='val_loss',
                                 patience=10,
                                 restore_best_weights=True)
 
@@ -53,7 +53,7 @@ def ANN(   hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, opti
 # Training
     history = model_ANN.fit(
     X_train_scaled, y_train_2,
-    validation_data=(X_val_scaled, y_val_2),  
+    validation_data=(X_val_scaled, y_val_2),
     epochs=epochs,
     batch_size=batch_size,
     shuffle=True,
@@ -65,7 +65,7 @@ def ANN(   hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, opti
     plt.figure(figsize=(8, 5))
     plt.plot(epochs,history.history['loss'], label='Train loss')
     plt.plot(epochs, history.history['val_loss'], label='Validation loss')
-    plt.axvline(best_epoch, color='red', linestyle='--', alpha=0.7, 
+    plt.axvline(best_epoch, color='red', linestyle='--', alpha=0.7,
             label=f'Meilleure epoch restaurée ({best_epoch})')
     plt.ylabel('Loss')
     plt.title('Train vs Validation Loss')
@@ -79,7 +79,7 @@ def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None :
         # Normalization
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train_1)
-        X_test_scaled = scaler.transform(X_test_1)  
+        X_test_scaled = scaler.transform(X_test_1)
         svm_model = SVC(kernel="rbf", C=C, gamma=gamma, random_state=42)
         svm_model.fit(X_train_scaled, y_train)
         y_pred_svm = svm_model.predict(X_test_scaled)
@@ -89,11 +89,11 @@ def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None :
 
 
 def XGBoost(X_train, X_test, y_train, y_test, n_estimators) -> None :
-        xgb_model = xgb.XGBClassifier(n_estimators = n_estimators, random_state=42)
+        xgb_model = xgb.XGBClassifier(n_estimators=n_estimators, random_state=42)
         xgb_model.fit(X_train, y_train)
         y_pred_xgb = xgb_model.predict(X_test)
         errors, n_errors = calculate_errors(y_pred_xgb, y_test)
-        return errors, n_errors 
+        return errors, n_errors
 
 
 def read_file(file_path):
@@ -109,22 +109,22 @@ def read_file(file_path):
 
     except FileNotFoundError:
         print(f"❌ Error: The file '{file_path}' does not exist.")
-    
-    return lines     
+
+    return lines
 
 def search_false_positives_or_false_negatives_in_predictions(y_pred, y_test) -> None:
         y_test_arr = np.array(y_test).flatten()
-        false_positives_idx = np.where((y_pred == 1) & (y_test_arr == 0))[0]  
-        false_negatives_idx = np.where((y_pred == 0) & (y_test_arr == 1))[0] 
+        false_positives_idx = np.where((y_pred == 1) & (y_test_arr == 0))[0]
+        false_negatives_idx = np.where((y_pred == 0) & (y_test_arr == 1))[0]
         print(f"False positives (predicted diabetic, but not): {len(false_positives_idx)}")
         print(f"False negatives (predicted non-diabetic, but actually is): {len(false_negatives_idx)}")
-        
+
 def calculate_errors(y_pred, y_test)  -> None:
         errors = np.abs(y_pred - y_test.values)
         n_errors = (errors == 1).sum()
         print(f"Number of errors: {n_errors} / {len(y_test)}")
-        print(f"Error rate: {n_errors / len(y_test):.2%}") 
-        
+        print(f"Error rate: {n_errors / len(y_test):.2%}")
+
         return errors, n_errors
 
 class ModelTrainer:
@@ -146,19 +146,19 @@ class ModelTrainer:
 
 
     def split_data_train_test(self, test_size) -> None:
-        
-        X_train, X_test, y_train, y_test = train_test_split( 
+
+        X_train, X_test, y_train, y_test = train_test_split(
                                             self.X,  self.y,
-                                            test_size = test_size, 
-                                            random_state=42     
+                                            test_size=test_size,
+                                            random_state=42
                                             )
         print("test_size:", test_size)
-        print(f"Train: {X_train.shape}, Test: {X_test.shape}")  
+        print(f"Train: {X_train.shape}, Test: {X_test.shape}")
 
         os.makedirs(os.path.dirname(self.config["model_trainer"]["train_data_path"]) or ".", exist_ok=True)
         os.makedirs(os.path.dirname(self.config["model_trainer"]["test_data_path"]) or ".", exist_ok=True)
 
-        # Concat X_train and y_train, then save it 
+        # Concat X_train and y_train, then save it
         df_train = pd.concat([X_train, y_train], axis=1)
         df_train.to_csv(self.config["model_trainer"]["train_data_path"], index=False)
 
@@ -167,8 +167,8 @@ class ModelTrainer:
         df_test.to_csv(self.config["model_trainer"]["test_data_path"], index=False)
 
         # Save test size value in a file
-        os.makedirs(os.path.dirname( self.config["model_trainer"]["test_size_value_file"]) or ".", exist_ok=True)
-        with open( self.config["model_trainer"]["test_size_value_file"], "w") as f:
+        os.makedirs(os.path.dirname(self.config["model_trainer"]["test_size_value_file"]) or ".", exist_ok=True)
+        with open(self.config["model_trainer"]["test_size_value_file"], "w") as f:
             f.write(str(test_size) + "\n")
 
 
@@ -178,7 +178,7 @@ class ModelTrainer:
             print("File train.csv doesn't exist, you need to split data")
 
         if not os.path.exists(self.config["model_trainer"]["test_data_path"]):
-            print("File test.csv doesn't exist, you need to split data")   
+            print("File test.csv doesn't exist, you need to split data")
 
         self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_path"])
         self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
@@ -212,48 +212,16 @@ class ModelTrainer:
         # search for the minimum error rate and the features that were removed using XGBoost
         print("")
         ModelTrainer.min_index = np.argmin(error_rate)
-        print(f"The features removed using XGBoost correspond to the lowest error rate: {self.list_feature_drop[:ModelTrainer.min_index]}")   
-        print("For other training models, those features will be eliminated")  
+        print(f"The features removed using XGBoost correspond to the lowest error rate: {self.list_feature_drop[:ModelTrainer.min_index]}")
+        print("For other training models, those features will be eliminated")
 
     def SVM_evaluate_feature_drop (self) -> None :
 
         if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
             print("File train.csv doesn't exist, split data")
-            
+
         if not os.path.exists(self.config["model_trainer"]["test_data_path"]):
-            print("File test.csv doesn't exist, split data")   
-        
-        self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_path"])
-        self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
-                
-        X_train = self.df_train.drop(self.target, axis=1)
-        y_train = self.df_train[self.target]
-
-        X_test = self.df_test.drop(self.target, axis=1)
-        y_test = self.df_test[self.target]
-
-        X_train_1 = X_train.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
-        X_test_1 = X_test.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)  
-
-        # get SVM params value from params.yaml
-        for item in self.params["models"]:
-            if item['model_name'] == 'SVM':
-                C = item['params']["C"]
-                gamma = item['params']["gamma"]
-                print("C value in params.yaml:", C)
-                print("gamma value in params.yaml:", gamma)
-
-        print("For SVM training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])     
-        SVM (X_train_1, X_test_1, y_train, y_test, C, gamma) 
-
-
-    def ANN_evaluate_feature_drop(self) -> None :
-
-        if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
-            print("File train.csv doesn't exist, split data")
-            
-        if not os.path.exists(self.config["model_trainer"]["test_data_path"]):
-            print("File test.csv doesn't exist, split data")   
+            print("File test.csv doesn't exist, split data")
 
         self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_path"])
         self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
@@ -267,8 +235,40 @@ class ModelTrainer:
         X_train_1 = X_train.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
         X_test_1 = X_test.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
 
-        print("For ANN training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])     
-        
+        # get SVM params value from params.yaml
+        for item in self.params["models"]:
+            if item['model_name'] == 'SVM':
+                C = item['params']["C"]
+                gamma = item['params']["gamma"]
+                print("C value in params.yaml:", C)
+                print("gamma value in params.yaml:", gamma)
+
+        print("For SVM training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])
+        SVM (X_train_1, X_test_1, y_train, y_test, C, gamma)
+
+
+    def ANN_evaluate_feature_drop(self) -> None :
+
+        if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
+            print("File train.csv doesn't exist, split data")
+
+        if not os.path.exists(self.config["model_trainer"]["test_data_path"]):
+            print("File test.csv doesn't exist, split data")
+
+        self.df_train = pd.read_csv(self.config["model_trainer"]["train_data_path"])
+        self.df_test = pd.read_csv(self.config["model_trainer"]["test_data_path"])
+
+        X_train = self.df_train.drop(self.target, axis=1)
+        y_train = self.df_train[self.target]
+
+        X_test = self.df_test.drop(self.target, axis=1)
+        y_test = self.df_test[self.target]
+
+        X_train_1 = X_train.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
+        X_test_1 = X_test.drop(self.list_feature_drop[:ModelTrainer.min_index], axis=1)
+
+        print("For ANN training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])
+
         # Split train data into train and validation sets
         X_train_2, X_val_2, y_train_2, y_val_2 = train_test_split(
             X_train_1, y_train, test_size=0.10, random_state=42, stratify=y_train)
@@ -276,7 +276,7 @@ class ModelTrainer:
         os.makedirs(os.path.dirname(self.config["model_trainer"]["train_data_ANN_path"]) or ".", exist_ok=True)
         os.makedirs(os.path.dirname(self.config["model_trainer"]["val_data_ANN_path"]) or ".", exist_ok=True)
 
-        # Concat X_train_2 and y_train_2, then save it 
+        # Concat X_train_2 and y_train_2, then save it
         df_train_ANN = pd.concat([X_train_2, y_train_2], axis=1)
         df_train_ANN.to_csv(self.config["model_trainer"]["train_data_ANN_path"], index=False)
 
@@ -284,13 +284,13 @@ class ModelTrainer:
         df_val_ANN = pd.concat([X_val_2, y_val_2], axis=1)
         df_val_ANN.to_csv(self.config["model_trainer"]["val_data_ANN_path"], index=False)
 
-        print(f"Split train data (train.csv) into train and validation sets: Train: {X_train_2.shape}, Validation: {X_val_2.shape}, Test: {X_test_1.shape}") 
+        print(f"Split train data (train.csv) into train and validation sets: Train: {X_train_2.shape}, Validation: {X_val_2.shape}, Test: {X_test_1.shape}")
 
         # Normalization
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train_2)
         X_val_scaled = scaler.transform(X_val_2)
-        X_test_scaled = scaler.transform(X_test_1) 
+        X_test_scaled = scaler.transform(X_test_1)
 
         # get ANN params value from params.yaml
         for item in self.params["models"]:
@@ -305,12 +305,12 @@ class ModelTrainer:
                 l2 = item['params']["l2"]
                 # Optimizer
                 optimizer = item['params']["optimizer"]
-                lr = item['params']["lr"] 
+                lr = item['params']["lr"]
 
         model_ANN = ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimizer,
                         lr, epochs, batch_size, X_train_scaled, y_train_2,X_val_scaled, y_val_2)
 
-        # Prediction 
+        # Prediction
         y_pred_prob = model_ANN.predict(X_test_scaled,verbose=0)
 
         # Conversion with threshold at 0.5 (standard)

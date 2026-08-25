@@ -1,6 +1,6 @@
 import zipfile
 from utils.common import load_yaml_config
-import os 
+import os
 
 
 class DataIngestion:

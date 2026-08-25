@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
-from sklearn.feature_selection import f_classif # ANOVA F-test 
+from sklearn.feature_selection import f_classif # ANOVA F-test
 from sklearn.feature_selection import mutual_info_classif # Mutual Information
 import xgboost as xgb # XGboost
 from sklearn.ensemble import RandomForestClassifier # Random Forest
@@ -19,10 +19,10 @@ class DataTransformation:
         self.target = 'Outcome'
         self.X = self.df.drop(self.target, axis=1)
         self.y = self.df[self.target]
-        
+
 # 1. Filter methods
 
-    def correlation_matrix(self) -> None:    
+    def correlation_matrix(self) -> None:
         plt.figure(figsize=(10, 8))
         corr = (self.df).corr()
         sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f")
@@ -30,7 +30,7 @@ class DataTransformation:
         plt.show()
 
 
-    def ANOVA_F_test(self) -> None:    
+    def ANOVA_F_test(self) -> None:
         # Calculate F-scores and p-value
         f_scores, p_values = f_classif(self.X, self.y)
 
@@ -40,31 +40,31 @@ class DataTransformation:
         # Display results
         for i in results:
             print(f"{self.X.columns[i]}: F-score = {f_scores[i]:.4f},\
-                    p-value = {p_values[i]:.4f}")    
+                    p-value = {p_values[i]:.4f}")
 
 
-    def mutual_information(self) -> None:       
+    def mutual_information(self) -> None:
         # Calculate MI for all columns
-        mi_scores = mutual_info_classif (self.X, self.y) 
+        mi_scores = mutual_info_classif (self.X, self.y)
 
         # Sort by MI value (from highest to lowest)
-        sorted_indices = np.argsort(mi_scores)[::-1] 
+        sorted_indices = np.argsort(mi_scores)[::-1]
         for i in sorted_indices:
             print(f"{self.df.drop(self.target, axis=1).columns[i]}: MI = {mi_scores[i]:.4f}")
 
 
-# 2. Embedded methods 
+# 2. Embedded methods
 
-    def random_forest(self) -> None:      
+    def random_forest(self) -> None:
         rf = RandomForestClassifier(n_estimators=200, random_state=42)
-        rf.fit(self.X, self.y) 
+        rf.fit(self.X, self.y)
         importance = pd.Series(rf.feature_importances_, index=self.X.columns).sort_values(ascending=False)
         print(importance)
 
 
-    def XGBoost(self):   
+    def XGBoost(self):
         xgb_model = xgb.XGBClassifier(n_estimators=200, random_state=42)
-        xgb_model.fit(self.X, self.y) 
+        xgb_model.fit(self.X, self.y)
         importance = pd.Series(xgb_model.feature_importances_, index=self.X.columns).sort_values(ascending=False)
         print(importance)
         return importance
@@ -76,8 +76,8 @@ class DataTransformation:
         # We will use the XGBoost results to save the list in the txt file.
         importance_XGBoost = DataTransformation().XGBoost()
         list_feature_drop = list(importance_XGBoost.keys()[3:])[::-1]
-        print("5 least important features (according to XGBoost):", list_feature_drop) 
-        print("Other feature selection methods generally give the same result")   
+        print("5 least important features (according to XGBoost):", list_feature_drop)
+        print("Other feature selection methods generally give the same result")
 
         # Save the list of the feature to drop in data_transformation
         os.makedirs(os.path.dirname(self.config["data_transformation"]["list_feature_drop_file"]) or ".", exist_ok=True)

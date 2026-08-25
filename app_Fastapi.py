@@ -18,7 +18,7 @@ def validated_data():
         if col_type == "int64":
             fields[col] = (int, Field(default=0, gt=0))
         elif col_type == "float64":
-            fields[col] = (float, Field(default=0, gt=0)) 
+            fields[col] = (float, Field(default=0, gt=0))
     model = create_model("PatientData", **fields)
     return model, feature_names
 
@@ -34,18 +34,18 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-@app.get('/')  
+@app.get('/')
 def homePage(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
 
 @app.api_route('/predict_or_pipeline', methods=['GET', 'POST'])
 async def pipeline_predict(request: Request):
-    
+
     form = await request.form()
-    
+
     if request.method == 'POST':
-        
+
 
         # case 1: "Pipeline" button was clicked
         if 'pipeline' in form:
@@ -57,7 +57,7 @@ async def pipeline_predict(request: Request):
                 return f"Error while starting the application: {e}", 500
 
         # case 2: "Predict" button was clicked
-        elif 'predict' in form:                           
+        elif 'predict' in form:
             feature_names = FEATURE_NAMES
             errors = {}
 
@@ -67,7 +67,7 @@ async def pipeline_predict(request: Request):
                model_fields = set(validated_data_model.model_fields.keys())
                # only keep the fields that the model expects ('predict' excluded)
                filtered_data = {k: v for k, v in form_dict.items() if k in model_fields}
-               
+
               # check whether filtered_data is empty
                if not filtered_data:
                  # add default values or return an error
@@ -98,29 +98,29 @@ async def pipeline_predict(request: Request):
                         }
                     )
 
-            # all values are valid -> make the prediction  
+            # all values are valid -> make the prediction
             input_values =  {k: v for k, v in data.model_dump().items() if k in feature_names}
 
             prediction = PredictNewData().predict_new_data(**input_values)
 
-            return templates.TemplateResponse('results.html', 
+            return templates.TemplateResponse('results.html',
                                                 {
                                                 "request": request,
                                                 "prediction": (prediction)
-                                                } )
+                                                })
 
     else:
     # GET, no button recognized -> display the empty form
         feature_names = FEATURE_NAMES
         return templates.TemplateResponse('predict.html',
-                                        {   "request": request,
+                                        {"request": request,
                                             "feature_names": feature_names,
                                             "values": 0
-                                        } )
+                                        })
 
 
 if __name__ == "__main__":
 	# reload=True: reload the server when the Python code changes (for production, it must be removed)
-	uvicorn.run(host="0.0.0.0", port = 8080, reload=True)
+	uvicorn.run(host="0.0.0.0", port=8080, reload=True)
 
 	# uvicorn.run(host="0.0.0.0", port = 8080)
