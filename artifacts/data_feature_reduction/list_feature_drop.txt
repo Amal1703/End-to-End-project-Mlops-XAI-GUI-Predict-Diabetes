@@ -1,5 +1,0 @@
-Insulin
-Pregnancies
-SkinThickness
-BloodPressure
-DiabetesPedigreeFunction
