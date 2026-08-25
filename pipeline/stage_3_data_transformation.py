@@ -52,7 +52,7 @@ class DataTransformation:
                 f"{self.df.drop(self.target, axis=1).columns[i]}: MI = {mi_scores[i]:.4f}")
 
 #  2. Embedded methods
-    
+
     def random_forest(self) -> None:
         rf = RandomForestClassifier(n_estimators=200, random_state=42)
         rf.fit(self.X, self.y)
