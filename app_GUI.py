@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
 import sys
-
 from pipeline.stage_1_data_ingestion import DataIngestion
 from pipeline.stage_2_data_validation import DataValidation
 from pipeline.stage_3_data_transformation import DataTransformation
@@ -9,51 +8,50 @@ from pipeline.stage_4_model_trainer import ModelTrainer
 from pipeline.stage_5_XAI_eXplainable_AI import XAI
 
 
-
 def prompt_input(parent, title, message, default_value=""):
 
-      result = {"value": None}
+    result = {"value": None}
     
-      dialog = tk.Toplevel(parent)
-      dialog.title(title)
-      dialog.geometry("350x150")
-      dialog.resizable(False, False)
+    dialog = tk.Toplevel(parent)
+    dialog.title(title)
+    dialog.geometry("350x150")
+    dialog.resizable(False, False)
     
     # Center the window
-      dialog.transient(parent)
-      dialog.grab_set()
+    dialog.transient(parent)
+    dialog.grab_set()
     
     # Message
-      tk.Label(dialog, text=message, font=("Arial", 10)).pack(pady=10)
+    tk.Label(dialog, text=message, font=("Arial", 10)).pack(pady=10)
     
     # Entry field
-      entry_var = tk.StringVar(value=default_value)
-      entry = tk.Entry(dialog, textvariable=entry_var, width=40, font=("Arial", 10))
-      entry.pack(pady=10)
-      entry.focus_set()
-      entry.select_range(0, tk.END)
+    entry_var = tk.StringVar(value=default_value)
+    entry = tk.Entry(dialog, textvariable=entry_var, width=40, font=("Arial", 10))
+    entry.pack(pady=10)
+    entry.focus_set()
+    entry.select_range(0, tk.END)
     
-      def on_ok():
-          result["value"] = entry_var.get()
-          dialog.destroy()
+    def on_ok():
+        result["value"] = entry_var.get()
+        dialog.destroy()
     
-      def on_cancel():
+    def on_cancel():
         dialog.destroy()
     
     # Buttons
-      btn_frame = tk.Frame(dialog)
-      btn_frame.pack(pady=10)
+    btn_frame = tk.Frame(dialog)
+    btn_frame.pack(pady=10)
     
-      tk.Button(btn_frame, text="OK", command=on_ok, width=10, bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=10)
-      tk.Button(btn_frame, text="Annuler", command=on_cancel, width=10, bg="#f44336", fg="white").pack(side=tk.LEFT, padx=10)
+    tk.Button(btn_frame, text="OK", command=on_ok, width=10, bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=10)
+    tk.Button(btn_frame, text="Annuler", command=on_cancel, width=10, bg="#f44336", fg="white").pack(side=tk.LEFT, padx=10)
     
     # Enter shortcut
-      entry.bind('<Return>', lambda e: on_ok())
-      entry.bind('<Escape>', lambda e: on_cancel())
+    entry.bind('<Return>', lambda e: on_ok())
+    entry.bind('<Escape>', lambda e: on_cancel())
     
-      parent.wait_window(dialog)
-      
-      return result["value"]
+    parent.wait_window(dialog)
+
+    return result["value"]
 
 # ---------------------------------------------------------
 # Represents a button that must first ASK the user for a value
@@ -75,7 +73,7 @@ class AskForValue:
 class ConsoleRedirector:
     def __init__(self, widget_text):
         self.widget_text = widget_text
- 
+
     def write(self, message):
     # print() may call write() multiple times for a single line
     # (once per argument + separators): we insert it as-is,
@@ -85,10 +83,10 @@ class ConsoleRedirector:
             self.widget_text.see(tk.END)
         self.widget_text.update_idletasks()
 
- 
+
     def flush(self):
         pass  # required by the sys.stdout interface, nothing to do here
- 
+
 
 # ---------------------------------------------------------
 # Data structure: a menu tree (pipeline)
@@ -98,14 +96,14 @@ MENU = {
     "Data ingestion": {
         "Extract the zip file into the data directory":  lambda: DataIngestion().extract_zip_file(),
     },
-    
+
     "Data validation": {
         "Visualize data and display the number of missing values": lambda: DataValidation().explore_data(),
         "Compare type and name columns of schema.yaml and data file": lambda: DataValidation().compare_type_and_name_columns(),
         "Visualize the distribution of a target variable (outcome)": lambda: DataValidation().visualize_distribution_target_variable(),
         "Plot histograms showing the distribution of all features for each category of a target variable": lambda: DataValidation().plot_histogram_each_column(),
     },
-    
+
     "Data transformation": {
         "Filter methods": {
             "Correlation matrix": lambda: DataTransformation().correlation_matrix(),
@@ -117,7 +115,7 @@ MENU = {
             "Random forest": lambda: DataTransformation().random_forest(),
             "XGBoost": lambda: DataTransformation().XGBoost(),
         },
-        
+
         "Show and save the 5 least important features to a file (based on XGBoost)": lambda: DataTransformation().save_least_important_features_to_file(),
     },
     
@@ -130,9 +128,9 @@ MENU = {
         "Train and evaluate SVM by dropping the features that were found by XGBoost to correspond to the lowest error rate": lambda: ModelTrainer().SVM_evaluate_feature_drop(),
         "Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate": lambda: ModelTrainer().ANN_evaluate_feature_drop(),
     },
-    
+
     "XAI (Shap method using ANN model)": lambda: XAI().SHAP(),
-    
+
 }
 
 
@@ -141,22 +139,22 @@ class App(tk.Tk):
         super().__init__()
         self.title("Stages of model training to predict diabetes (order of stages from top button to bottom)")
         self.geometry("400x400")
- 
+
         # Navigation stack for handling the "Back" button
         self.historic = []
- 
+
         self.frame = tk.Frame(self)
         self.frame.pack(expand=True, fill="both", padx=20, pady=20)
- 
+
         # Scrollable text area that will display print() output and results
         self.result_area = scrolledtext.ScrolledText(
-            self, height=10, font=("Consolas", 10), fg="blue"
-        )
+            self, height=10, font=("Consolas", 10), fg="blue")
+
         self.result_area.pack(fill="both", expand=True, padx=10, pady=10)
- 
+
         # Redirect all print() calls from the entire program to this text area
         sys.stdout = ConsoleRedirector(self.result_area)
- 
+
         self.show_menu(MENU)
 
 
@@ -187,7 +185,7 @@ class App(tk.Tk):
                 self.frame, text="⬅ Back", width=25, command=self.back  
             )
             back_button.pack(pady=15)
- 
+
     def click(self, content, text): 
         if isinstance(content, AskForValue):
             # First, prompt the user for a test size value using a popup dialog
@@ -205,7 +203,7 @@ class App(tk.Tk):
             # It's a sub-menu: we move forward / we navigate deeper
             self.historic.append(content)
             self.show_menu(content)
- 
+
         elif callable(content):
             # It's a function: we execute it now.
             print(f"--- Start : {text} ---")
@@ -214,7 +212,7 @@ class App(tk.Tk):
                 print(f"--- End : {text} ---\n")
             except Exception as e:
                 print(f"Error : {e}")
- 
+
         else:
             # final result (static text): we display it
             print(content)
@@ -226,7 +224,7 @@ class App(tk.Tk):
         self.show_menu(previous_menu)
 
 
-
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+    

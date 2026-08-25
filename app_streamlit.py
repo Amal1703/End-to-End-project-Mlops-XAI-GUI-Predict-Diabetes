@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from contextlib import redirect_stdout
 from datetime import datetime
 import re
-
 from pipeline.stage_1_data_ingestion import DataIngestion
 from pipeline.stage_2_data_validation import DataValidation
 from pipeline.stage_3_data_transformation import DataTransformation
@@ -20,30 +19,29 @@ from pipeline.stage_6_predict_new_data import PredictNewData
 # Initialization
 if "test_size" not in st.session_state:
     st.session_state.test_size = 0.2
-    
+
 if "show_dialog" not in st.session_state:
     st.session_state.show_dialog = False
-    
+
 if "dialog_action" not in st.session_state:
     st.session_state.dialog_action = False 
-    
+
 if "log_output" not in st.session_state:
     st.session_state.log_output = ""    
-    
+
 
 def _dialog_content():
     """Dialogue content"""
     st.write("### ⚙️ Configuration of test_size (between 0.01 and 0.99)")
-    
+
     new_value = st.number_input(
         "Value of test_size",
         min_value=0.01,
         max_value=0.99,
-        value=round(st.session_state.test_size, 2)
-    )
-    
+        value=round(st.session_state.test_size, 2))
+
     col_ok, col_cancel = st.columns(2)
-    
+
     with col_ok:
         if st.button("✅ Confirm", use_container_width=True):
             st.session_state.test_size = new_value
@@ -52,26 +50,25 @@ def _dialog_content():
             st.success(f"✅ Test_size = {new_value:.2f}")
             st.rerun()
             return new_value
-    
+
     with col_cancel:
         if st.button("❌ Cancel", use_container_width=True):
             st.session_state.show_dialog = False
             st.session_state.dialog_action = 'cancelled'
             st.rerun()
             return None
-    
+
     return None       
 
 
 def display_results(func, title=""):
-    
     """Display the print() outputs of a function "func" and its matplotlib plots"""    
     buffer = io.StringIO()
     with redirect_stdout(buffer):
         func()
 
 
-   # Display of the generated figures
+    # Display of the generated figures
     fignums = plt.get_fignums()
     for num in fignums:
         fig = plt.figure(num)
@@ -82,7 +79,7 @@ def display_results(func, title=""):
     timestamp = datetime.now().strftime("%H:%M:%S")
     
     if plt.get_fignums():
-      entry =  (
+        entry =  (
         f"\n{'='*70}\n"
         f"[{timestamp}] {title}\n"
         f"{'='*70}\n"
@@ -90,8 +87,7 @@ def display_results(func, title=""):
         f"📊 {len(plt.get_fignums())} generated graph(s)\n"
         f"{'='*70}"
         f"\n✅ End of {title}\n"
-        f"{'='*70}\n"
-      )
+        f"{'='*70}\n")
     else:
         entry =  (
         f"\n{'='*70}\n"
@@ -100,10 +96,8 @@ def display_results(func, title=""):
         f"{buffer.getvalue()}"
         f"{'='*70}"
         f"\n✅ End of {title}\n"
-        f"{'='*70}\n"
-      )
+        f"{'='*70}\n")
     st.session_state.log_output += entry
-
 
 
 def render_toggle_stage_button ( i ) :
@@ -118,16 +112,16 @@ def render_toggle_stage_button ( i ) :
             session_state and its widget key from the
             corresponding lists (stage_name, session_state, key).
     """
+
+    stage_name = [  "📊 Data validation ", "🔧 Data transformation", "1: Filter methods",
+                    "2: Embedded methods", "🧠 Model trainer", "🎯 Diabetes Prediction with ANN"]
     
-    stage_name = ["📊 Data validation ", "🔧 Data transformation", "1: Filter methods",
-                  "2: Embedded methods", "🧠 Model trainer", "🎯 Diabetes Prediction with ANN"]
-    
-    session_state = ["show_validation", "show_transformation", "show_Filter_methods",
-                     "show_Embedded_methods", "show_Model_trainer", "show_predict"]
-    
-    key = ["btn2", "btn3", "btn_Filter_methods",
-           "btn_Embedded_methods", "btn4", "btn6"]
-    
+    session_state = [  "show_validation", "show_transformation", "show_Filter_methods",
+                        "show_Embedded_methods", "show_Model_trainer", "show_predict"]
+
+    key = [ "btn2", "btn3", "btn_Filter_methods",
+            "btn_Embedded_methods", "btn4", "btn6"]
+
     arrow = "▲" if st.session_state[session_state[i]] else "▼"
     if st.button( stage_name[i] +"  "+  f"{arrow}", use_container_width=True, key=key[i]):
         st.session_state[session_state[i]] = not st.session_state[session_state[i]]
@@ -223,42 +217,42 @@ with col3:
 
     if st.session_state["show_transformation"]:   
         with st.container(key="sub_buttons"):
-         
+
          # Define 3 buttons
          b1, b2 = st.columns(2, gap="small")
          b3 = st.columns(1)[0]
             
          with b1:
             if "show_Filter_methods" not in st.session_state:
-               st.session_state["show_Filter_methods"] = False
-               
+                st.session_state["show_Filter_methods"] = False
+
             render_toggle_stage_button (2) # Filter methods
 
             if st.session_state["show_Filter_methods"]: 
-                 
-                 if st.button("1: Correlation matrix"):     
-                      display_results(lambda: DataTransformation().correlation_matrix(),title="Correlation matrix")
-                
-                 if st.button("2: Mutual information"):     
-                      display_results(lambda: DataTransformation().mutual_information(),title="Mutual information")
 
-                 if st.button("3: ANOVA F test"):     
-                      display_results(lambda: DataTransformation().ANOVA_F_test(),title=" ANOVA F test")
+                if st.button("1: Correlation matrix"):     
+                        display_results(lambda: DataTransformation().correlation_matrix(),title="Correlation matrix")
+                
+                if st.button("2: Mutual information"):     
+                        display_results(lambda: DataTransformation().mutual_information(),title="Mutual information")
+
+                if st.button("3: ANOVA F test"):     
+                        display_results(lambda: DataTransformation().ANOVA_F_test(),title=" ANOVA F test")
 
 
          with b2:
             if "show_Embedded_methods" not in st.session_state:
-               st.session_state["show_Embedded_methods"] = False
-               
-            render_toggle_stage_button (3) # Embedded methods
-               
-            if st.session_state["show_Embedded_methods"]: 
-                 
-                 if st.button("1: Random forest"):     
-                      display_results(lambda: DataTransformation().random_forest(),title="Random forest")
+                st.session_state["show_Embedded_methods"] = False
 
-                 if st.button("2: XGBoost"):     
-                      display_results(lambda: DataTransformation().XGBoost(),title="XGBoost")
+            render_toggle_stage_button (3) # Embedded methods
+
+            if st.session_state["show_Embedded_methods"]: 
+
+                if st.button("1: Random forest"):     
+                        display_results(lambda: DataTransformation().random_forest(),title="Random forest")
+
+                if st.button("2: XGBoost"):     
+                        display_results(lambda: DataTransformation().XGBoost(),title="XGBoost")
 
          with b3:
             if st.button("3: Show and save the 5 least important features to a file (based on XGBoost)"):     
@@ -269,26 +263,23 @@ with col4:
     
     if "show_Model_trainer" not in st.session_state:
         st.session_state["show_Model_trainer"] = False
-     
+
     render_toggle_stage_button (4)   
-        
+
     if st.session_state["show_Model_trainer"]:  
         if st.button("1: Split data into training and test sets"):
-             st.session_state.show_dialog = True
-             st.session_state.dialog_action = None
-             st.rerun()
-             
-                    
+                st.session_state.show_dialog = True
+                st.session_state.dialog_action = None
+                st.rerun()
+
         # Open the dialog box
         if st.session_state.show_dialog == True:
                 test_size = _dialog_content()
     
         # Display the logs if dialog is closed and validated 
         elif st.session_state.dialog_action == 'validated':
-
-                display_results(
-                  lambda: ModelTrainer().split_data_train_test(st.session_state.test_size),
-                  title="Split data into training and test sets")
+                display_results(lambda: ModelTrainer().split_data_train_test(st.session_state.test_size),
+                                title="Split data into training and test sets")
                 st.session_state.dialog_action = None
 
 
@@ -300,47 +291,47 @@ with col4:
             
         if st.button("4: Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate"):
             display_results(lambda: ModelTrainer().ANN_evaluate_feature_drop(),title="Train and evaluate ANN by dropping the features that were found by XGBoost to correspond to the lowest error rate")
-            
- 
+
+
 with col5:
     if st.button("🔬 XAI (Shap method using ANN model)", use_container_width=True, key="btn5"):
         display_results(lambda: XAI().SHAP(), title="XAI (Shap method using ANN model)")
 
- 
+
 with col6:
     
     if "show_predict" not in st.session_state:
         st.session_state["show_predict"] = False
-            
+
     render_toggle_stage_button (5)  
-    
+
     if st.session_state["show_predict"]:
         
         input_values = {}
         feature_names, schema_columns = PredictNewData().get_input_column_X_train_and_schema()
 
         for col in feature_names:
-          col_type = schema_columns[col]  # "int64" ou "float64"
-          raw_value = st.text_input(label=col, value="0", key=f"input_{col}")
+            col_type = schema_columns[col]  # "int64" ou "float64"
+            raw_value = st.text_input(label=col, value="0", key=f"input_{col}")
 
-          # validate the column type
-          if col_type == "int64":
-            if not (raw_value.strip().lstrip('-').isdigit()) or (int(raw_value) <= 0):
-                st.error(f"{col} value must be a positive integer")
-            else:
-                input_values[col] = int(raw_value)
+            # validate the column type
+            if col_type == "int64":
+                if not (raw_value.strip().lstrip('-').isdigit()) or (int(raw_value) <= 0):
+                    st.error(f"{col} value must be a positive integer")
+                else:
+                    input_values[col] = int(raw_value)
 
-          elif col_type == "float64":
-            if not re.match(r'^-?\d+(\.\d+)?$', raw_value.strip()) or (float(raw_value) <= 0):
-                st.error( f"{col} value must be a positive float")
-            else:
-                input_values[col] = float(raw_value)
+            elif col_type == "float64":
+                if not re.match(r'^-?\d+(\.\d+)?$', raw_value.strip()) or (float(raw_value) <= 0):
+                    st.error( f"{col} value must be a positive float")
+                else:
+                    input_values[col] = float(raw_value)
 
         if st.session_state["show_predict"]:  
-             if st.button("Diabetes Prediction using ANN"):
-                  display_results(lambda: print("Diabetes Prediction (1: diabetes; 0: no diabetes): ",
-                               PredictNewData().predict_new_data(**input_values)),
-                               title="Diabetes Prediction using ANN")
+                if st.button("Diabetes Prediction using ANN"):
+                    display_results(lambda: print("Diabetes Prediction (1: diabetes; 0: no diabetes): ",
+                                    PredictNewData().predict_new_data(**input_values)),
+                                    title="Diabetes Prediction using ANN")
 
 # === Display all logs in this window ===
 st.text_area("Logs", st.session_state.log_output, height=500)
@@ -350,4 +341,3 @@ if st.button("🗑️ Clear logs and plots"):
     st.session_state.log_output = ""
     st.session_state.figures = []
     st.rerun()
-

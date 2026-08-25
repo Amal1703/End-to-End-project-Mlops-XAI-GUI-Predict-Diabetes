@@ -72,5 +72,5 @@ class XAI:
         )
 
         plt.show()
-        
+
 # we can add Lime method (see test.py)

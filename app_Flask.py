@@ -73,12 +73,12 @@ def pipeline_predict():
     # GET, no button recognized -> display the empty form
     feature_names, schema_columns = PredictNewData().get_input_column_X_train_and_schema()
     return render_template('predict.html', feature_names=feature_names, values=session.get('last_values', {}))
-      
-      
+
+
 if __name__ == "__main__":
 	# Without debug=True, Flask won't auto-reload the server or the templates.
 	# To avoid having to restart manually after every change during development, enable
 	# debug mode (for development only, never in production)
 	#app.run(host="0.0.0.0", port = 8080, debug=True)
- 
+
 	app.run(host="0.0.0.0", port = 8080)

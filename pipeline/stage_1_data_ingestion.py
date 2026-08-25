@@ -2,6 +2,7 @@ import zipfile
 from utils.common import load_yaml_config
 import os 
 
+
 class DataIngestion:
 
     def __init__(self, config_path: str = "yaml file/config.yaml"):
