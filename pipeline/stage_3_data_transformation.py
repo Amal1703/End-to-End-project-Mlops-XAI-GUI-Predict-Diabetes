@@ -54,6 +54,7 @@ class DataTransformation:
 
 # 2. Embedded methods
 
+
     def random_forest(self) -> None:
         rf = RandomForestClassifier(n_estimators=200, random_state=42)
         rf.fit(self.X, self.y)
