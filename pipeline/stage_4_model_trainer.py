@@ -60,7 +60,8 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
         epochs=epochs,
         batch_size=batch_size,
         shuffle=True,
-        callbacks=[early_stop, reduce_lr])
+        callbacks=[early_stop, reduce_lr],
+        verbose=2)
 
 # --- Plot loss train vs val ---
     best_epoch = len(history.history['loss']) - early_stop.patience

@@ -145,5 +145,5 @@ For secrets.GCP_SA_KEY: you need to execute these 4 commands in order:
       - SERVICE_NAME : This the name you choose for your Cloud Run service. It identifies your deployed service in the Google Cloud Console and appears in the generated URL
 
 
-7. After a successful deployment (no errors), the deployment command will output the public URL of your service directly in the terminal. It will look like: https://SERVICE_NAME-xxxxx-REGION.a.run.app
+7. After a successful deployment (no errors), the deployment command will output the public URL of your service directly in the terminal. It will look like: https://${SERVICE_NAME} -xxxxx-${REGION}.a.run.app
 You can view the URL and logs in the Google Cloud Console
