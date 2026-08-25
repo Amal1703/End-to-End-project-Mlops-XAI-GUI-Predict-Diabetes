@@ -75,7 +75,7 @@ def ANN(hidden_layer_sizes, activation_hidden_layer, l2, dropout_values, optimiz
 
     return model_ANN
 
-def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None :
+def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None:
     # Normalization
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train_1)
@@ -87,7 +87,7 @@ def SVM(X_train_1, X_test_1, y_train, y_test, C, gamma) -> None :
     search_false_positives_or_false_negatives_in_predictions(y_pred_svm, y_test)
 
 
-def XGBoost(X_train, X_test, y_train, y_test, n_estimators) -> None :
+def XGBoost(X_train, X_test, y_train, y_test, n_estimators) -> None:
     xgb_model = xgb.XGBClassifier(n_estimators=n_estimators, random_state=42)
     xgb_model.fit(X_train, y_train)
     y_pred_xgb = xgb_model.predict(X_test)
@@ -128,7 +128,7 @@ def calculate_errors(y_pred, y_test)  -> None:
 
 class ModelTrainer:
     # Shared variables for all functions
-    min_index = 0  #  Corresponds to the index that shows the minimum error rate after dropping the features using XGBoost
+    min_index = 0  # Corresponds to the index that shows the minimum error rate after dropping the features using XGBoost
 
     def __init__(self, config_path: str = "yaml file/config.yaml", schema_filepath: str = "yaml file/schema.yaml", params_filepath: str = "yaml file/params.yaml"):
         self.config = load_yaml_config(config_path)
@@ -168,7 +168,7 @@ class ModelTrainer:
         with open(self.config["model_trainer"]["test_size_value_file"], "w") as f:
             f.write(str(test_size) + "\n")
 
-    def XGBoost_evaluate_feature_drop(self) -> None :
+    def XGBoost_evaluate_feature_drop(self) -> None:
 
         if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
             print("File train.csv doesn't exist, you need to split data")
@@ -191,7 +191,7 @@ class ModelTrainer:
                 n_estimators = item['params']["n_estimators"]
                 print("n_estimators value in params.yaml:", n_estimators)
 
-        drop_feature=[]
+        drop_feature = []
         error_rate = []
 
         for i in range(len(self.list_feature_drop) + 1):
@@ -211,7 +211,7 @@ class ModelTrainer:
         print(f"The features removed using XGBoost correspond to the lowest error rate: {self.list_feature_drop[:ModelTrainer.min_index]}")
         print("For other training models, those features will be eliminated")
 
-    def SVM_evaluate_feature_drop(self) -> None :
+    def SVM_evaluate_feature_drop(self) -> None:
 
         if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
             print("File train.csv doesn't exist, split data")
@@ -242,7 +242,7 @@ class ModelTrainer:
         print("For SVM training, those features will be eliminated:", self.list_feature_drop[:ModelTrainer.min_index])
         SVM(X_train_1, X_test_1, y_train, y_test, C, gamma)
 
-    def ANN_evaluate_feature_drop(self) -> None :
+    def ANN_evaluate_feature_drop(self) -> None:
 
         if not os.path.exists(self.config["model_trainer"]["train_data_path"]):
             print("File train.csv doesn't exist, split data")

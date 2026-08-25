@@ -77,7 +77,7 @@ def display_results(func, title=""):
     timestamp = datetime.now().strftime("%H:%M:%S")
 
     if plt.get_fignums():
-        entry =  (
+        entry = (
             f"\n{'='*70}\n"
             f"[{timestamp}] {title}\n"
             f"{'='*70}\n"
@@ -87,7 +87,7 @@ def display_results(func, title=""):
             f"\n✅ End of {title}\n"
             f"{'='*70}\n")
     else:
-        entry =  (
+        entry = (
             f"\n{'='*70}\n"
             f"[{timestamp}] {title}\n"
             f"{'='*70}\n"
@@ -98,7 +98,7 @@ def display_results(func, title=""):
     st.session_state.log_output += entry
 
 
-def render_toggle_stage_button(i) :
+def render_toggle_stage_button(i):
     """ Renders a Streamlit button for stage `i` that acts as a collapsible toggle
 
         The button label combines the stage's name with a directional arrow
@@ -121,7 +121,7 @@ def render_toggle_stage_button(i) :
            "btn_Embedded_methods", "btn4", "btn6"]
 
     arrow = "▲" if st.session_state[session_state[i]] else "▼"
-    if st.button(stage_name[i] +"  "+  f"{arrow}", use_container_width=True, key=key[i]):
+    if st.button(stage_name[i] + "  " + f"{arrow}", use_container_width=True, key=key[i]):
         st.session_state[session_state[i]] = not st.session_state[session_state[i]]
         st.rerun()   # force an immediate rerun to sync the display upon this click
 

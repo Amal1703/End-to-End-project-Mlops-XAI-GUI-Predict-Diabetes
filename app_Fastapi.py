@@ -98,7 +98,7 @@ async def pipeline_predict(request: Request):
                     )
 
             # all values are valid -> make the prediction
-            input_values =  {k: v for k, v in data.model_dump().items() if k in feature_names}
+            input_values = {k: v for k, v in data.model_dump().items() if k in feature_names}
 
             prediction = PredictNewData().predict_new_data(**input_values)
 
