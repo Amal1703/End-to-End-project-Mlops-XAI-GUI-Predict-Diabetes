@@ -3,6 +3,7 @@ import joblib
 import matplotlib.pyplot as plt
 from utils.common import load_yaml_config
 import pandas as pd
+import io
 # XAI
 import shap
 
@@ -43,9 +44,8 @@ class XAI:
         # Compute the SHAP values (for class 1, the model's native output)
         shap_values = explainer(self.X_test_scaled, silent=True)
 
-        plt.figure()
+        fig_1 = plt.figure()
         plt.title("Fig 1: SHAP - Importance of features (class 1: diabetic)")
-        plt.tight_layout()
 
         # --- Summary plot for class 1  ---
         shap.summary_plot(shap_values,
@@ -54,6 +54,11 @@ class XAI:
                           feature_names=self.feature_names,
                           show=False)
 
+        buf = io.BytesIO()
+        fig_1.savefig(buf,
+                      format="png",
+                      bbox_inches="tight")
+        plt.tight_layout()
         plt.show()
 
         # --- Summary plot for class 0 (just with the opposite sign) ---
@@ -62,9 +67,8 @@ class XAI:
                                               data=shap_values.data,
                                               feature_names=self.feature_names)
 
-        plt.figure()
+        fig_2 = plt.figure()
         plt.title("Fig 2: SHAP - Importance of features (class 0: non-diabetic)")
-        plt.tight_layout()
 
         shap.summary_plot(shap_values_class0,
                           self.X_test_scaled,
@@ -72,5 +76,10 @@ class XAI:
                           feature_names=self.feature_names,
                           show=False)
 
+        buf = io.BytesIO()
+        fig_2.savefig(buf,
+                      format="png",
+                      bbox_inches="tight")
+        plt.tight_layout()
         plt.show()
 # we can add Lime method (see test.py)
