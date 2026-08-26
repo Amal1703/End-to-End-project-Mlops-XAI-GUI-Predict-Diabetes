@@ -17,7 +17,6 @@ env/
 
 # Ignore folders that contain non-essential resources for running the application
 artifacts/      
-dataset/
 notebook/  
 
 # GUI

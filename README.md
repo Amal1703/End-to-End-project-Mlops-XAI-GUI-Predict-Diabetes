@@ -101,7 +101,7 @@ python app_Fastapi.py
 12. Create and fill in the CI/CD file, which is the main.yaml file in (.github\workflows). Add secrets to GitHub (Settings → Secrets and variables → Actions → click the "New repository secret" button and add the names and their secrets).
    - Example: click on New repository secret: Name GCP_REGION and secret europe-west9
 
-For secrets.GCP_SA_KEY: you need to execute these 4 commands in order:
+For the secret GCP_SA_KEY : you need to execute these 4 commands in order:
 
  1. Deploy and manage Cloud Run services:
     - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${ACCOUNT_NAME}@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/run.admin"
