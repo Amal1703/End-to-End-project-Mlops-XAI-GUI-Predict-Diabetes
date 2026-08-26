@@ -12,9 +12,6 @@ data_validation:  # ensure that the data is valid
 
 data_transformation: # transform the data: feature selection methods (PCA, MI etc.)
   # root_dir:  artifacts/data_transformation
-  # data_path: artifacts/data_ingestion/diabetes_dataset.csv
-  # transf_data_file: artifacts/data_transformation/transf_data_file.csv # contain the information required for data normalization (e.g., mean, max, etc.)
-  # encoder_file: artifacts/data_transformation/encoder.pkl
   list_feature_drop_file: artifacts/data_feature_reduction/list_feature_drop.txt 
 
 model_trainer: # normalization, splits data into train, test and validation (validation set only ANN), training model and evaluation
@@ -29,9 +26,4 @@ model_trainer: # normalization, splits data into train, test and validation (val
   model_path: artifacts/model_trainer/model.joblib
   scaler_path: artifacts/model_trainer/scaler.joblib
 
-#predict_new_value: (we use ANN model)
-  #root_dir: artifacts/predict_new_value
-
-#XAI_eXplainable_AI: (we use ANN model)
-  
 

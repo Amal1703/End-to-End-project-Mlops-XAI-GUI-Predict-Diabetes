@@ -103,13 +103,17 @@ python app_Fastapi.py
 
 For secrets.GCP_SA_KEY: you need to execute these 4 commands in order:
 
- - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:github-deployer@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/run.admin"
+ 1. Deploy and manage Cloud Run services:
+    - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${ACCOUNT_NAME}@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/run.admin"
+ 
+ 2. Push your Docker image to artifact registry:
+    - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${ACCOUNT_NAME}@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/artifactregistry.writer"
 
- - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:github-deployer@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/artifactregistry.writer"
+ 3. Authorize a service account to use the identity of another service account (for example, the one used by Cloud Run) in order to act on its behalf:
+    - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser"
 
- - gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:github-deployer${PROJECT_ID}.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser"
-
- - gcloud iam service-accounts keys create key.json --iam-account=github-deployer@${PROJECT_ID}.iam.gserviceaccount.com
+ 4. Generate an authentication key (key.json file) for the service account:
+    - gcloud iam service-accounts keys create key.json --iam-account=${ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 
 => key.json will be created in the folder. We have added key.json to .gitignore and .dockerignore
 
@@ -130,7 +134,6 @@ For secrets.GCP_SA_KEY: you need to execute these 4 commands in order:
        - ARTIFACT_REGISTRY_NAME : The name for the artifact repository
 
 5. Build the Docker image in the Artifact Registry repository:
-
        - gcloud builds submit --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REGISTRY_NAME}/${IMAGE_NAME} 
        - IMAGE_NAME : This is the name you choose for your Docker image
 
